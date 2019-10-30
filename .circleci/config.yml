@@ -5,7 +5,13 @@ orbs:
 
 jobs:
   build:
+    docker:
+      - image: buildpack-deps:trusty
     executor: win/vs2019
     steps:
       - checkout
       - run: Write-Host 'Hello, Windows'
+      - run:
+          name: Download Miniconda
+          command: |
+            powershell (New-Object System.Net.WebClient).DownloadFile('https://repo.anaconda.com/miniconda/Miniconda3-latest-Windows-x86_64.exe', 'Anaconda3.exe')
