@@ -18,3 +18,7 @@ jobs:
             Unblock-File Anaconda3.exe
             .\Anaconda3.exe /InstallationType=JustMe /RegisterPython=1 /S /D=%UserProfile%\Anaconda3
             setx /M PATH "%PATH%;%UserProfile%\Anaconda3;%UserProfile%\Anaconda3\Scripts;%UserProfile%\Anaconda3\Library\bin"
+            conda env create -f environment.yml
+            conda activate myenv
+            python main.py
+
