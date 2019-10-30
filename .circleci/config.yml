@@ -17,7 +17,7 @@ jobs:
             (New-Object System.Net.WebClient).DownloadFile('https://repo.anaconda.com/miniconda/Miniconda3-latest-Windows-x86_64.exe', 'Anaconda3.exe')
             Unblock-File Anaconda3.exe
             .\Anaconda3.exe /InstallationType=JustMe /RegisterPython=1 /S /D=\Anaconda3
-            Set PATH=%PATH%;\Anaconda3;\Anaconda3\Scripts;Anaconda3\Library\bin
+            $env:Path += "%PATH%;\Anaconda3;\Anaconda3\Scripts;\Anaconda3\Library\bin"
             conda env create -f environment.yml
             conda activate myenv
             python main.py
