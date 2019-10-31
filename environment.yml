@@ -1,3 +1,5 @@
 dependencies:
   - pandas
-  - reportlab
+  - jinja2
+  - pip:
+      - xhtml2pdf

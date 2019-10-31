@@ -1,5 +1,7 @@
 import pandas as pd
-from reportlab.pdfgen import canvas
+from xhtml2pdf import pisa
+import os
+from jinja2 import Template
 
 
 def read_data(path):
@@ -11,7 +13,14 @@ def read_data(path):
 
 
 def create_pdf(path):
-    c = canvas.Canvas(path)
-    c.drawString(100, 100, "Hello World")
-    c.save()
+    with open(os.path.join(os.path.dirname(__file__), 'template.html')) as f:
+        html = Template(f.read())
+
+    html = html.render(data='Sample Data')
+
+    with open(path, "w+b") as f:
+        pisa_status = pisa.CreatePDF(html, dest=f)
+
+    return pisa_status.err
+
 
