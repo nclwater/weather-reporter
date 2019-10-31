@@ -12,14 +12,14 @@ def read_data(path):
     return df
 
 
-def create_pdf(path):
+def create_pdf(path, **kwargs):
     with open(os.path.join(os.path.dirname(__file__), 'template.html')) as f:
         html = Template(f.read())
 
-    html = html.render(data='Sample Data')
+    html = html.render(**kwargs)
 
     with open(path, "w+b") as f:
-        pisa_status = pisa.CreatePDF(html, dest=f)
+        pisa_status = pisa.CreatePDF(html, dest=f, default_css=open(os.path.join(os.path.dirname(__file__), 'typography.css')).read())
 
     return pisa_status.err
 

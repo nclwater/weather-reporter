@@ -1,5 +1,6 @@
 dependencies:
   - pandas
   - jinja2
+  - matplotlib
   - pip:
       - xhtml2pdf

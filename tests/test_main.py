@@ -14,7 +14,10 @@ class TestMain(unittest.TestCase):
         self.assertGreater(len(df), 0)
 
     def test_create_pdf(self):
-        create_pdf(pdf_path)
+        df = read_data(sample_data).iloc[:5]
+        df = df[df.columns[:5]]
+
+        create_pdf(pdf_path, data=df.to_html())
 
 
 if __name__ == '__main__':
