@@ -14,6 +14,4 @@ RUN setx /M PATH "%PATH%;%UserProfile%\Anaconda3;%UserProfile%\Anaconda3\Scripts
 
 COPY environment.yml environment.yml
 
-RUN conda env create --name myenv -f environment.yml
-
-RUN activate myenv
+RUN conda env update -n base -f environment.yml
