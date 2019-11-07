@@ -4,23 +4,9 @@ trigger:
 pool:
   vmImage: 'win1803'
 
-stages:
-- stage:
-  jobs:
-  - job:
-    steps:
-    - task: Docker@2
-      inputs:
-        repository: 'weather-reporter'
-        command: 'build'
-        Dockerfile: '**/Dockerfile'
-- stage:
-  jobs:
-  - job:
-    container:
-      image: 'weather-reporter'
-    steps:
-      - script: conda
-        displayName: 'run anaconda'
+steps:
+- script: |
+    docker build -f Dockerfile --name weather-reporter
+    docker run weather-reporter
 
 
