@@ -4,11 +4,19 @@ trigger:
 pool:
   vmImage: 'win1803'
 
-steps:
-- task: Docker@2
-  inputs:
-    containerRegistry: 'Docker Registry'
-    repository: 'anaconda-windows'
-    command: 'buildAndPush'
-    Dockerfile: '**/Dockerfile'
-    tags: 'weather-reporter-$(Build.BuildId)'
+jobs:
+- job:
+  steps:
+  - task: Docker@2
+    inputs:
+      containerRegistry: 'Docker Registry'
+      repository: 'fmcclean/anaconda-windows'
+      command: 'buildAndPush'
+      Dockerfile: '**/Dockerfile'
+      tags: 'weather-reporter-$(Build.BuildId)'
+- job:
+    container: 'fmcclean/anaconda-windows:weather-reporter-$(Build.BuildId)'
+    steps:
+    - script: conda
+
+
