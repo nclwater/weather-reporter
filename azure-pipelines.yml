@@ -6,17 +6,21 @@ pool:
 
 stages:
 - stage:
-  steps:
-  - task: Docker@2
-    inputs:
-      repository: 'weather-reporter'
-      command: 'build'
-      Dockerfile: '**/Dockerfile'
+  jobs:
+  - job:
+    steps:
+    - task: Docker@2
+      inputs:
+        repository: 'weather-reporter'
+        command: 'build'
+        Dockerfile: '**/Dockerfile'
 - stage:
-  container:
-    image: 'weather-reporter'
-  steps:
-    - script: conda
-      displayName: 'run anaconda'
+  jobs:
+  - job:
+    container:
+      image: 'weather-reporter'
+    steps:
+      - script: conda
+        displayName: 'run anaconda'
 
 
