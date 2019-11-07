@@ -17,6 +17,6 @@ stages:
       image: 'weather-reporter'
     steps:
       - script: conda
-          displayName: 'run anaconda'
+        displayName: 'run anaconda'
 
 
