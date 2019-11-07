@@ -7,6 +7,10 @@
 <body>
 <h1>Hello World</h1>
 <p>{{ data }}</p>
+{% if plot is defined %}
+    <img src="{{ plot }}" height="100" width="100"/>
+{% else %}
+{%endif %}
 
 </body>
 </html>
