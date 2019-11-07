@@ -4,9 +4,12 @@ trigger:
 pool:
   vmImage: 'win1803'
 
+container:
+  image: 'fmcclean/anaconda-windows:weather-reporter'
+  endpoint: 'Docker Registry'
+
 steps:
-- script: |
-    docker build -t weather-reporter .
-    docker run weather-reporter
+
+- script: conda info
 
 
