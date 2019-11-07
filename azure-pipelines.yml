@@ -10,6 +10,7 @@ container:
 
 steps:
 
-- script: conda info
+- script: python -m unittest tests/test_main.py
+  displayName: 'run test_main.py'
 
 
