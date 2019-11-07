@@ -6,7 +6,7 @@ pool:
 
 steps:
 - script: |
-    docker build -f Dockerfile --name weather-reporter
+    docker build -f Dockerfile -t weather-reporter
     docker run weather-reporter
 
 
