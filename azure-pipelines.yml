@@ -8,10 +8,10 @@ stages:
 - stage:
     steps:
     - task: Docker@2
-        inputs:
-          repository: 'weather-reporter'
-          command: 'build'
-          Dockerfile: '**/Dockerfile'
+      inputs:
+        repository: 'weather-reporter'
+        command: 'build'
+        Dockerfile: '**/Dockerfile'
 - stage:
     container:
       image: 'weather-reporter'
