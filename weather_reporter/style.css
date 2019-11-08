@@ -1,0 +1,6 @@
+img {
+  width: 800px;
+  height: 300px;
+}
+
+@page {margin: 2cm; size: A4 landscape}

@@ -2,15 +2,15 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Hello World</title>
+    <title></title>
+    <style type="text/css">
+        {{ css }}
+    </style>
 </head>
 <body>
-<h1>Hello World</h1>
-<p>{{ data }}</p>
-{% if plot is defined %}
-    <img src="{{ plot }}" height="100" width="100"/>
-{% else %}
-{%endif %}
+{% for path in plot %}
+    <p><img class="plot" src="{{ path }}"/></p>
+{% endfor %}
 
 </body>
 </html>

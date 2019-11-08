@@ -10,7 +10,7 @@ container:
 
 steps:
 
-- script: python -m unittest tests/test_main.py
-  displayName: 'run test_main.py'
+- script: python -m unittest tests/test_layout.py
+  displayName: 'run test_layout.py'
 
 
