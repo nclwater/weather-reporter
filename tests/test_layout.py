@@ -1,8 +1,8 @@
 import unittest
 from weather_reporter import Layout
+import os
 
-
-path = 'sample_data/sample.txt'
+path = os.path.join(os.path.dirname(__file__), 'sample_data/sample.txt')
 
 
 class TestLayout(unittest.TestCase):
