@@ -15,7 +15,7 @@ steps:
 
 - task: PublishPipelineArtifact@1
   inputs:
-    targetPath: 'all_plots.pdf'
-    artifactName: 'all_plots.pdf'
+    targetPath: 'tests/outputs/temp_out.pdf'
+    artifactName: 'temp_out.pdf'
 
 
