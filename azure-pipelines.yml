@@ -19,6 +19,9 @@ steps:
 - script: conda env update --quiet -f environment.yml -n base
   displayName: Install packages from environment.yml
 
+- script: call activate
+  displayName: Activate anaconda environment
+
 - script: python -m unittest tests/test_layout.py
   displayName: 'run test_layout.py'
 
