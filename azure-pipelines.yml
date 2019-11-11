@@ -19,19 +19,20 @@ steps:
 - script: conda env update --quiet -f environment.yml -n base
   displayName: Install packages from environment.yml
 
-- script: call activate
-  displayName: Activate anaconda environment
-
-- script: python -m unittest tests/test_layout.py
-  displayName: 'run test_layout.py'
+- script: |
+    call activate
+    python -m unittest tests/test_layout.py
+  displayName: Test layout.py
 
 - task: PublishPipelineArtifact@1
   inputs:
     targetPath: 'tests/outputs/temp_out.pdf'
     artifactName: 'temp_out.pdf'
 
-- script: python -m PyInstaller -y build.spec $(version)
-  displayName: 'Build exe'
+- script: |
+    call activate
+    python -m PyInstaller -y build.spec $(version)
+  displayName: Build exe
 
 - script: |
     git push origin :refs/tags/$(version)
