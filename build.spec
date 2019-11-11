@@ -2,8 +2,9 @@
 
 import os
 import tinycss2
+import sys
 
-version = '0.1.0'
+version = sys.argv[0][1:]
 
 block_cipher = None
 

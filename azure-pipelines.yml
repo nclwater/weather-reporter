@@ -8,6 +8,10 @@ container:
   image: 'fmcclean/anaconda-windows:weather-reporter'
   endpoint: 'Docker Registry'
 
+
+variables:
+  version: v0.1.0
+
 steps:
 
 - script: python -m unittest tests/test_layout.py
@@ -18,10 +22,14 @@ steps:
     targetPath: 'tests/outputs/temp_out.pdf'
     artifactName: 'temp_out.pdf'
 
-- script: python -m PyInstaller -y build.spec
+- script: python -m PyInstaller -y build.spec $(version)
   displayName: 'Build exe'
 
-- task: PublishPipelineArtifact@1
-  inputs:
-    targetPath: 'dist'
-    artifactName: 'build.exe'
+- task: GitHubRelease@0
+  displayName: ‘Edit GitHub Release’
+  inputs: gitHubConnection: fmcclean
+  repositoryName: fmcclean/weather-reporter
+  action: edit
+  tag: $(version)
+  assets: dist/*
+  isDraft: true
