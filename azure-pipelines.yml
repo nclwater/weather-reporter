@@ -18,4 +18,10 @@ steps:
     targetPath: 'tests/outputs/temp_out.pdf'
     artifactName: 'temp_out.pdf'
 
+- script: python -m PyInstaller -Y build.spec
+  displayName: 'Build exe'
 
+- task: PublishPipelineArtifact@1
+  inputs:
+    targetPath: 'dist'
+    artifactName: 'build.exe'

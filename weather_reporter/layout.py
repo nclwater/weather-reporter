@@ -1,12 +1,9 @@
 import pandas as pd
 import matplotlib.pyplot as plt
-import os
 from reportlab.platypus import SimpleDocTemplate
 from svglib.svglib import svg2rlg
 from reportlab.lib.pagesizes import A4, landscape
-image_dir = os.path.join(os.path.dirname(__file__), '.images')
-if not os.path.exists(image_dir):
-    os.mkdir(image_dir)
+from io import BytesIO
 
 
 class Layout:
@@ -18,16 +15,21 @@ class Layout:
         self.end_date: pd.datetime = None
         self.plot: str = None
         self.variable = None
+        self.plot: BytesIO = None
 
         self.read_dataset()
         self.save_plot()
 
     def save_plot(self):
+
+        self.plot = BytesIO()
+
         f, ax = plt.subplots(figsize=(9, 6))
         self.df[self.start_date:self.end_date][self.variable].plot(ax=ax, title=self.variable)
         plt.tight_layout()
-        self.plot = os.path.join(image_dir, '{}.svg'.format(self.variable))
-        f.savefig(self.plot)
+
+        f.savefig(self.plot, format='svg')
+        self.plot.seek(0)
 
     def read_dataset(self):
         self.df = pd.read_csv(self.path, sep='\t', parse_dates=[[0, 1]], header=[0,1])
