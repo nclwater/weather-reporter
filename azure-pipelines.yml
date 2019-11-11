@@ -35,6 +35,8 @@ steps:
   displayName: Build exe
 
 - script: |
+    git config --global user.email "fergus.mcclean@ncl.ac.uk"
+    git config --global user.name "Fergus McClean"
     git push origin :refs/tags/$(version)
     git tag -fa $(version)
     git push origin master --tags
