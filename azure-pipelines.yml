@@ -8,18 +8,16 @@ pool:
 #  image: 'fmcclean/anaconda-windows:weather-reporter'
 #  endpoint: 'Docker Registry'
 
-
-- powershell: Write-Host "##vso[task.prependpath]$env:CONDA\Scripts"
-  displayName: Add conda to PATH
-
-
-- script: conda env update --yes --quiet -f environment.yml -n base
-  displayName: Install packages from environment.yml
-
 variables:
   version: v0.1.0
 
 steps:
+
+- powershell: Write-Host "##vso[task.prependpath]$env:CONDA\Scripts"
+  displayName: Add conda to PATH
+
+- script: conda env update --yes --quiet -f environment.yml -n base
+  displayName: Install packages from environment.yml
 
 - script: python -m unittest tests/test_layout.py
   displayName: 'run test_layout.py'
