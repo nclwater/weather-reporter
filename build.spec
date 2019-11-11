@@ -28,7 +28,7 @@ exe = EXE(pyz,
           a.zipfiles,
           a.datas,
           name=name,
-          upx=True,
+          upx=False,
           strip=False,
           console=True,
           debug=True)

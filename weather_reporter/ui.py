@@ -1,7 +1,9 @@
-from PyQt5.QtWidgets import QMainWindow, QApplication
+from PyQt5.QtWidgets import QMainWindow, QApplication, QMessageBox
 from PyQt5 import QtSvg
 from weather_reporter import Layout
 import sys
+import pandas as pd
+import os
 
 
 class App(QMainWindow):
@@ -24,17 +26,18 @@ class App(QMainWindow):
     def dropEvent(self, event):
         for url in event.mimeData().urls():
             self.path = url.toLocalFile()
-            print(self.path)
-            self.layout = Layout(self.path)
+            try:
+                self.layout = Layout(self.path)
+            except pd.errors.ParserError:
+                msg = QMessageBox()
+                msg.setText('Could not load from {}'.format(os.path.basename(self.path)))
+                msg.exec_()
+                return
             self.plot = QtSvg.QSvgWidget()
             self.plot.load(self.layout.plot.read())
-            self.plot.setGeometry(50, 50, 759, 668)
             self.setCentralWidget(self.plot)
-            # self.plot.show()
-
 
             break
-
 
 
 if __name__ == '__main__':

@@ -16,7 +16,6 @@ class Layout:
         self.plot: str = None
         self.variable = None
         self.plot: BytesIO = None
-
         self.read_dataset()
         self.save_plot()
 
