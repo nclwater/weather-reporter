@@ -27,9 +27,10 @@ steps:
 
 - task: GitHubRelease@0
   displayName: ‘Edit GitHub Release’
-  inputs: gitHubConnection: fmcclean
-  repositoryName: fmcclean/weather-reporter
-  action: edit
-  tag: $(version)
-  assets: dist/*
-  isDraft: true
+  inputs:
+    gitHubConnection: fmcclean
+    repositoryName: fmcclean/weather-reporter
+    action: edit
+    tag: $(version)
+    assets: dist/*
+    isDraft: true
