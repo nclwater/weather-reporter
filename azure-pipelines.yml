@@ -27,7 +27,7 @@ steps:
 
 - script: |
     call activate
-    python -m PyInstaller -y build.spec $(version)
+    python -m PyInstaller -y build.spec
   displayName: Build exe
 
 - task: GitHubRelease@0

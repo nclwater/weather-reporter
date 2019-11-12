@@ -4,7 +4,7 @@ import os
 import tinycss2
 import subprocess
 
-version = subprocess.check_output(["git", "describe"]).strip()
+version = subprocess.check_output(["git", "describe"]).strip().decode()
 
 block_cipher = None
 
