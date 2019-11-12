@@ -13,7 +13,7 @@ steps:
 
 - script: |
     echo "##vso[task.setvariable variable=version]git describe"
-    echo $VERSION
+    echo git describe
   displayName: Get version number from git
 
 - powershell: Write-Host "##vso[task.prependpath]$env:CONDA\Scripts"
@@ -43,8 +43,7 @@ steps:
   inputs:
     gitHubConnection: github/fmcclean
     repositoryName: fmcclean/weather-reporter
-    action: create
-    tagSource: Git tag
+    action: edit
     releaseNotesFile: docs/release_notes/$(version).md
     assets: dist/*
     isPreRelease: true
