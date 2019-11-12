@@ -6,7 +6,9 @@ pool:
 
 steps:
 
-- script: echo "##vso[task.setvariable variable=version]git describe"
+- script: |
+    echo "##vso[task.setvariable variable=version]git describe"
+    echo $(version)
   displayName: Get version number from git
 
 - powershell: Write-Host "##vso[task.prependpath]$env:CONDA\Scripts"
