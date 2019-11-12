@@ -8,7 +8,7 @@ steps:
 
 - script: |
     echo "##vso[task.setvariable variable=version]git describe"
-    echo $(version)
+    echo $VERSION
   displayName: Get version number from git
 
 - powershell: Write-Host "##vso[task.prependpath]$env:CONDA\Scripts"
