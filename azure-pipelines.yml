@@ -45,6 +45,7 @@ steps:
     repositoryName: fmcclean/weather-reporter
     action: edit
     releaseNotesFile: docs/release_notes/$(version).md
+    tag: $(version)
     assets: dist/*
     isPreRelease: true
     title: Shetran Results Viewer $(version)
