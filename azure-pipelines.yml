@@ -1,5 +1,10 @@
 trigger:
-- master
+  tags:
+    include:
+    - v*
+  branches:
+    include:
+    - master
 
 pool:
   vmImage: 'windows-latest'
