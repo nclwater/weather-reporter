@@ -38,6 +38,7 @@ steps:
     repositoryName: fmcclean/weather-reporter
     action: create
     tagSource: Git tag
+    releaseNotesFile: docs/release_notes/$(version).md
     assets: dist/*
     isPreRelease: true
     title: Shetran Results Viewer $(version)
