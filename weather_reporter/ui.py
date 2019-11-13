@@ -1,4 +1,5 @@
-from PyQt5.QtWidgets import QMainWindow, QApplication, QMessageBox, QComboBox, QVBoxLayout, QWidget
+from PyQt5.QtWidgets import QMainWindow, QApplication, QMessageBox, QComboBox, QVBoxLayout, QWidget, QPushButton, \
+    QFileDialog
 from PyQt5 import QtSvg
 from weather_reporter import Layout
 import sys
@@ -23,6 +24,9 @@ class App(QMainWindow):
         self.plot.setMinimumWidth(800)
         self.plot.setMinimumHeight(500)
 
+        self.saveButton = QPushButton('Save')
+        self.saveButton.clicked.connect(self.save)
+
         self.mainLayout = QVBoxLayout()
 
         self.mainWidget = QWidget()
@@ -34,6 +38,7 @@ class App(QMainWindow):
 
         self.mainLayout.addWidget(self.variableDropDown)
         self.mainLayout.addWidget(self.plot)
+        self.mainLayout.addWidget(self.saveButton)
 
         self.variableDropDown.activated.connect(self.change_variable)
 
@@ -71,10 +76,16 @@ class App(QMainWindow):
     def update_plot(self):
         self.layout.save_plot()
         self.plot.load(self.layout.plot.read())
+        self.layout.plot.seek(0)
 
     def change_variable(self, variable_idx):
         self.layout.variable = self.layout.variables[variable_idx]
         self.update_plot()
+
+    def save(self):
+        dialog = QFileDialog.getSaveFileName(filter="PDF Files (*.pdf)")
+        if dialog[0] != '':
+            self.layout.create_pdf(dialog[0])
 
 
 if __name__ == '__main__':
