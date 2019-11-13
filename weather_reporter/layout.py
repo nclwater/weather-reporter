@@ -16,15 +16,17 @@ class Layout:
         self.plot: str = None
         self.variable = None
         self.plot: BytesIO = None
-        self.read_dataset()
-        self.save_plot()
+        self.freq = '1H'
 
-    def save_plot(self):
+        self.read_dataset()
+        self.update_plot()
+
+    def update_plot(self):
 
         self.plot = BytesIO()
 
         f, ax = plt.subplots(figsize=(9, 6))
-        self.df[self.start_date:self.end_date][self.variable].plot(ax=ax, title=self.variable)
+        self.df[self.start_date:self.end_date][self.variable].resample(self.freq).sum().plot(ax=ax, title=self.variable)
         plt.tight_layout()
 
         f.savefig(self.plot, format='svg')
@@ -51,3 +53,8 @@ class Layout:
     def set_variable(self, variable):
         assert variable in self.variables, '{} not available'.format(variable)
         self.variable = variable
+        self.update_plot()
+
+    def set_frequency(self, freq):
+        self.freq = freq
+        self.update_plot()
