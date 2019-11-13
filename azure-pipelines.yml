@@ -49,4 +49,4 @@ steps:
     tag: $(version)
     assets: dist/*
     isPreRelease: true
-    title: Shetran Results Viewer $(version)
+    title: Weather Reporter $(version)
