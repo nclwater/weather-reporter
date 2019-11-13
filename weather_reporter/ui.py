@@ -1,5 +1,5 @@
 from PyQt5.QtWidgets import QMainWindow, QApplication, QMessageBox, QComboBox, QVBoxLayout, QWidget, QPushButton, \
-    QFileDialog
+    QFileDialog, QHBoxLayout
 from PyQt5 import QtSvg
 from weather_reporter import Layout
 import sys
@@ -25,6 +25,8 @@ class App(QMainWindow):
         self.plot.setMinimumWidth(800)
         self.plot.setMinimumHeight(500)
 
+        row1 = QHBoxLayout()
+
         self.saveButton = QPushButton('Save')
         self.saveButton.clicked.connect(self.save)
 
@@ -36,8 +38,19 @@ class App(QMainWindow):
         self.setCentralWidget(self.mainWidget)
 
         self.variableDropDown = QComboBox()
+        self.resampleDropDown = QComboBox()
+        for freq, name in [('1H', 'Hourly'), ('1D', 'Daily'), ('1W', 'Weekly'), ('1M', 'Monthly')]:
+            self.resampleDropDown.addItem(name, freq)
 
-        self.mainLayout.addWidget(self.variableDropDown)
+        self.resampleDropDown.activated.connect(self.set_frequency)
+
+        row1.addWidget(self.variableDropDown)
+        row1.addWidget(self.resampleDropDown)
+
+        for row in [row1]:
+            widget = QWidget()
+            widget.setLayout(row)
+            self.mainLayout.addWidget(widget)
         self.mainLayout.addWidget(self.plot)
         self.mainLayout.addWidget(self.saveButton)
 
@@ -69,24 +82,29 @@ class App(QMainWindow):
 
     def add_data(self):
         self.layout = Layout(self.path)
-        self.update_plot()
 
         for var in self.layout.variables:
             self.variableDropDown.addItem(var)
 
-    def update_plot(self):
-        self.layout.save_plot()
+        self.show_plot()
+
+    def show_plot(self):
         self.plot.load(self.layout.plot.read())
         self.layout.plot.seek(0)
 
     def change_variable(self, variable_idx):
-        self.layout.variable = self.layout.variables[variable_idx]
-        self.update_plot()
+        self.layout.set_variable(self.layout.variables[variable_idx])
+        self.show_plot()
 
     def save(self):
         dialog = QFileDialog.getSaveFileName(filter="PDF Files (*.pdf)")
         if dialog[0] != '':
             self.layout.create_pdf(dialog[0])
+
+    def set_frequency(self):
+        freq = self.resampleDropDown.itemData(self.resampleDropDown.currentIndex())
+        self.layout.set_frequency(freq)
+        self.show_plot()
 
 
 if __name__ == '__main__':
