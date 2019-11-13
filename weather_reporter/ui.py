@@ -16,6 +16,7 @@ class App(QMainWindow):
 
     def __init__(self):
         super().__init__()
+        self.setWindowTitle('SHEAR Weather Reporter')
         self.activateWindow()
         self.setAcceptDrops(True)
         self.path = None
