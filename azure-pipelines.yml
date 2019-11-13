@@ -48,5 +48,6 @@ steps:
     releaseNotesFile: docs/release_notes/$(version).md
     tag: $(version)
     assets: dist/*
+    isDraft: false
     isPreRelease: true
-    title: Weather Reporter $(version)
+    title: SHEAR Weather Reporter $(version)
