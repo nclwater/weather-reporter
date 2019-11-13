@@ -10,16 +10,26 @@ outputs = os.path.join(tests, 'outputs')
 if not os.path.exists(outputs):
     os.mkdir(outputs)
 
+layout = Layout(sample_data)
 
 class TestLayout(unittest.TestCase):
 
     def test_temperature(self):
-        layout = Layout(sample_data)
         layout.set_variable('temp_out')
         layout.create_pdf(os.path.join(outputs, 'temp_out.pdf'))
 
     def test_incompatible_file(self):
         self.assertRaises(pd.errors.ParserError, lambda: Layout(os.path.join(sample_data_folder, 'incompatible.txt')))
+
+    def test_update_plot(self):
+        layout.update_plot()
+
+    def test_set_variable(self):
+        layout.set_variable('temp_out')
+
+    def test_set_frequency(self):
+        layout.set_frequency('1D')
+
 
 
 
