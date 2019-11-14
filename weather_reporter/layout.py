@@ -1,9 +1,12 @@
 import pandas as pd
 import matplotlib.pyplot as plt
-from reportlab.platypus import SimpleDocTemplate
+from reportlab.platypus import SimpleDocTemplate, Paragraph
 from svglib.svglib import svg2rlg
 from reportlab.lib.pagesizes import A4, landscape
+from reportlab.lib.styles import getSampleStyleSheet
 from io import BytesIO
+
+style = getSampleStyleSheet()
 
 
 class Layout:
@@ -26,7 +29,7 @@ class Layout:
         self.plot = BytesIO()
 
         f, ax = plt.subplots(figsize=(9, 6))
-        self.df[self.start_date:self.end_date][self.variable].resample(self.freq).sum().plot(ax=ax, title=self.get_name())
+        self.df[self.start_date:self.end_date][self.variable].resample(self.freq).sum().plot(ax=ax)
         plt.tight_layout()
 
         f.savefig(self.plot, format='svg')
@@ -49,7 +52,7 @@ class Layout:
         doc = SimpleDocTemplate(path, rightMargin=0, leftMargin=0, topMargin=0, bottomMargin=0,
                                 pagesize=landscape(A4))
 
-        doc.build([svg2rlg(self.plot)])
+        doc.build([Paragraph(self.get_name(), style=style['h1']), svg2rlg(self.plot)])
 
     def set_variable(self, variable):
         assert variable in self.variables, '{} not available'.format(variable)

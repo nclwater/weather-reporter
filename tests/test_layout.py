@@ -30,6 +30,9 @@ class TestLayout(unittest.TestCase):
     def test_set_frequency(self):
         layout.set_frequency('1D')
 
+    def test_create_pdf(self):
+        layout.create_pdf('tests/test.pdf')
+
 
 
 
