@@ -84,7 +84,7 @@ class App(QMainWindow):
         self.layout = Layout(self.path)
 
         for var in self.layout.variables:
-            self.variableDropDown.addItem(var)
+            self.variableDropDown.addItem(self.layout.get_name(var))
 
         self.show_plot()
 
