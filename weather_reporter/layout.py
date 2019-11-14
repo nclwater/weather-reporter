@@ -26,7 +26,7 @@ class Layout:
         self.plot = BytesIO()
 
         f, ax = plt.subplots(figsize=(9, 6))
-        self.df[self.start_date:self.end_date][self.variable].resample(self.freq).sum().plot(ax=ax, title=self.variable)
+        self.df[self.start_date:self.end_date][self.variable].resample(self.freq).sum().plot(ax=ax, title=self.get_name())
         plt.tight_layout()
 
         f.savefig(self.plot, format='svg')
@@ -58,3 +58,38 @@ class Layout:
     def set_frequency(self, freq):
         self.freq = freq
         self.update_plot()
+
+    def get_name(self):
+
+        names = {
+            'temp_out': 'Temperature',
+            'hi_temp': 'Maximum Temperature (C)',
+            'low_temp': 'Minimum Temperature (C)',
+            'out_hum': 'Humidity (%)',
+            'dew_pt': 'Dew Point Temperature (C)',
+            'wind_speed': 'Wind Speed (km/h)',
+            'wind_dir': 'Wind Direction',
+            'wind_run': 'Wind Run (km)',
+            'hi_speed': 'Maximum Wind Speed (km/h)',
+            'hi_dir': 'Direction of Maximum Wind Speed',
+            'wind_chill': 'Wind Chill Factor (C)',
+            'heat_index': 'Heat Index (C)',
+            'thw_index': 'Feels Like Temperature (C)',
+            'bar': 'Pressure (millibar)',
+            'rain': 'Rainfall (mm)',
+            'rain_rate': 'Rainfall Rate (mm/h)',
+            'heat_d-d': 'Heating Degree Day (C)',
+            'cool_d-d': 'Cooling Degree Day (C)',
+            'in_temp': 'Indoor Temperature (C)',
+            'in_hum': 'Indoor Humidity (%)',
+            'in_dew': 'Indoor Dewpoint Temperature (C)',
+            'in_heat': 'Indoor Heat Index (C)',
+            'in_emc': 'Equilibrium Moisture Content ',
+            'in_air_density': 'Indoor Air Density',
+            'wind_samp': 'Number of Wind Measurements',
+            'wind_tx': 'RF Channel for wind data',
+            'iss_recept': '% - RF reception',
+            'arc_int': 'Archive Interval (min)',
+        }
+
+        return names[self.variable]
