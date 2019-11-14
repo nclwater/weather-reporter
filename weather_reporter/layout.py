@@ -31,6 +31,7 @@ class Layout:
 
         f.savefig(self.plot, format='svg')
         self.plot.seek(0)
+        plt.close(f)
 
     def read_dataset(self):
         self.df = pd.read_csv(self.path, sep='\t', parse_dates=[[0, 1]], header=[0,1])
