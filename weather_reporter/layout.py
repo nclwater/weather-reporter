@@ -39,7 +39,7 @@ class Layout:
     def read_dataset(self):
         self.df = pd.read_csv(self.path, sep='\t', parse_dates=[[0, 1]], header=[0,1])
         self.df = self.df.set_index(self.df.columns[0])
-        self.df.index.name = 'date_time'
+        self.df.index.name = None
         self.df.columns = [' '.join([c.strip() for c in col if 'Unnamed' not in c]).lower() for col in self.df.columns]
         self.df.columns = [col.replace(' ', '_').replace('.', '') for col in self.df.columns]
         self.variables = self.df.select_dtypes(include=['int', 'float']).columns
@@ -49,10 +49,13 @@ class Layout:
 
     def create_pdf(self, path):
 
+        title_style = style['h1']
+        title_style.alignment = 1
+
         doc = SimpleDocTemplate(path, rightMargin=0, leftMargin=0, topMargin=0, bottomMargin=0,
                                 pagesize=landscape(A4))
 
-        doc.build([Paragraph(self.get_name(), style=style['h1']), svg2rlg(self.plot)])
+        doc.build([Paragraph(self.get_name(), style=title_style), svg2rlg(self.plot)])
 
     def set_variable(self, variable):
         assert variable in self.variables, '{} not available'.format(variable)
