@@ -1,5 +1,5 @@
 from PyQt5.QtWidgets import QMainWindow, QApplication, QMessageBox, QComboBox, QVBoxLayout, QWidget, QPushButton, \
-    QFileDialog, QHBoxLayout
+    QFileDialog, QHBoxLayout, QSlider
 from PyQt5 import QtSvg
 from weather_reporter import Layout
 import sys
@@ -24,6 +24,8 @@ class App(QMainWindow):
         self.plot = QtSvg.QSvgWidget()
         self.plot.setMinimumWidth(800)
         self.plot.setMinimumHeight(500)
+
+        self.dateSlider = QSlider()
 
         row1 = QHBoxLayout()
 
@@ -86,6 +88,7 @@ class App(QMainWindow):
         for var in self.layout.variables:
             self.variableDropDown.addItem(self.layout.get_name(var))
 
+        self.dateSlider.setMaximum(len(self.layout.df))
         self.show_plot()
 
     def show_plot(self):
