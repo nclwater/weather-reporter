@@ -65,8 +65,14 @@ class Layout:
 
     def get_name(self, variable=None):
 
-        names = {
-            'temp_out': 'Temperature',
+        if variable is None:
+            return names[self.variable]
+        else:
+            return names[variable]
+
+
+names = {
+            'temp_out': 'Temperature (C)',
             'hi_temp': 'Maximum Temperature (C)',
             'low_temp': 'Minimum Temperature (C)',
             'out_hum': 'Humidity (%)',
@@ -93,10 +99,5 @@ class Layout:
             'wind_samp': 'Number of Wind Measurements',
             'wind_tx': 'RF Channel for wind data',
             'iss_recept': '% - RF reception',
-            'arc_int': 'Archive Interval (min)',
-        }
-
-        if variable is None:
-            return names[self.variable]
-        else:
-            return names[variable]
+            'arc_int': 'Archive Interval (min)'
+}
