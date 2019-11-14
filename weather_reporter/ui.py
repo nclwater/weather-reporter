@@ -1,6 +1,7 @@
 from PyQt5.QtWidgets import QMainWindow, QApplication, QMessageBox, QComboBox, QVBoxLayout, QWidget, QPushButton, \
     QFileDialog, QHBoxLayout, QSlider
 from PyQt5 import QtSvg
+from PyQt5.QtCore import Qt
 from weather_reporter import Layout
 import sys
 import pandas as pd
@@ -24,8 +25,7 @@ class App(QMainWindow):
         self.plot = QtSvg.QSvgWidget()
         self.plot.setMinimumWidth(800)
         self.plot.setMinimumHeight(500)
-
-        self.dateSlider = QSlider()
+        self.dateSlider = QSlider(orientation=Qt.Horizontal)
 
         row1 = QHBoxLayout()
 
@@ -49,7 +49,10 @@ class App(QMainWindow):
         row1.addWidget(self.variableDropDown)
         row1.addWidget(self.resampleDropDown)
 
-        for row in [row1]:
+        row2 = QHBoxLayout()
+        row2.addWidget(self.dateSlider)
+
+        for row in [row1, row2]:
             widget = QWidget()
             widget.setLayout(row)
             self.mainLayout.addWidget(widget)
