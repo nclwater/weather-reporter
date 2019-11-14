@@ -59,7 +59,7 @@ class Layout:
         self.freq = freq
         self.update_plot()
 
-    def get_name(self):
+    def get_name(self, variable=None):
 
         names = {
             'temp_out': 'Temperature',
@@ -92,4 +92,7 @@ class Layout:
             'arc_int': 'Archive Interval (min)',
         }
 
-        return names[self.variable]
+        if variable is None:
+            return names[self.variable]
+        else:
+            return names[variable]
