@@ -27,6 +27,7 @@ class App(QMainWindow):
         self.plot.setMinimumHeight(500)
         self.periodSlider = QSlider(orientation=Qt.Horizontal)
         self.startDateSlider = QSlider(orientation=Qt.Horizontal)
+        self.startDateSlider.valueChanged.connect(self.set_start_date)
 
         row1 = QHBoxLayout()
 
@@ -93,10 +94,15 @@ class App(QMainWindow):
         for var in self.layout.variables:
             self.variableDropDown.addItem(self.layout.get_name(var))
 
-        self.startDateSlider.setMaximum(len(self.layout.df))
-        self.periodSlider.setMaximum(len(self.layout.df))
+        self.startDateSlider.setMaximum(len(self.layout.df) - 1)
+        self.periodSlider.setMaximum(len(self.layout.df) - 1)
         self.periodSlider.setValue(len(self.layout.df))
 
+        self.show_plot()
+
+    def set_start_date(self, i):
+        self.layout.set_start_date(i)
+        self.periodSlider.setMaximum(len(self.layout.df) - i)
         self.show_plot()
 
     def show_plot(self):

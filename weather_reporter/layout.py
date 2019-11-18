@@ -20,6 +20,7 @@ class Layout:
         self.variable = None
         self.plot: BytesIO = None
         self.freq = '1H'
+        self.original_df = None
 
         self.read_dataset()
         self.update_plot()
@@ -29,7 +30,7 @@ class Layout:
         self.plot = BytesIO()
 
         f, ax = plt.subplots(figsize=(9, 6))
-        self.df[self.start_date:self.end_date][self.variable].resample(self.freq).sum().plot(ax=ax)
+        self.df.loc[self.start_date:self.end_date, self.variable].plot(ax=ax)
         plt.tight_layout()
 
         f.savefig(self.plot, format='svg')
@@ -46,6 +47,7 @@ class Layout:
         self.variable = self.variables[0]
         self.start_date = self.df.index[0]
         self.end_date = self.df.index[-1]
+        self.original_df = self.df.copy()
 
     def create_pdf(self, path):
 
@@ -64,6 +66,11 @@ class Layout:
 
     def set_frequency(self, freq):
         self.freq = freq
+        self.df = self.original_df.resample(freq).sum()
+        self.update_plot()
+
+    def set_start_date(self, i):
+        self.start_date = self.df.index[i]
         self.update_plot()
 
     def get_name(self, variable=None):
