@@ -93,6 +93,10 @@ class App(QMainWindow):
         for var in self.layout.variables:
             self.variableDropDown.addItem(self.layout.get_name(var))
 
+        self.startDateSlider.setMaximum(len(self.layout.df))
+        self.periodSlider.setMaximum(len(self.layout.df))
+        self.periodSlider.setValue(len(self.layout.df))
+
         self.show_plot()
 
     def show_plot(self):
