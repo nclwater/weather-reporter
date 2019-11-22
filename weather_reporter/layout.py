@@ -73,6 +73,11 @@ class Layout:
         self.start_date = self.df.index[i]
         self.update_plot()
 
+    def set_duration(self, i):
+        df = self.df[self.start_date:self.end_date]
+        self.end_date = df.index[df.index.get_loc(self.start_date) + i]
+        self.update_plot()
+
     def get_name(self, variable=None):
 
         if variable is None:

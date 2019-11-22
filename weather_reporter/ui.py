@@ -25,9 +25,10 @@ class App(QMainWindow):
         self.plot = QtSvg.QSvgWidget()
         self.plot.setMinimumWidth(800)
         self.plot.setMinimumHeight(500)
-        self.periodSlider = QSlider(orientation=Qt.Horizontal)
+        self.durationSlider = QSlider(orientation=Qt.Horizontal)
         self.startDateSlider = QSlider(orientation=Qt.Horizontal)
         self.startDateSlider.valueChanged.connect(self.set_start_date)
+        self.durationSlider.valueChanged.connect(self.set_duration)
 
         row1 = QHBoxLayout()
 
@@ -53,7 +54,7 @@ class App(QMainWindow):
 
         row2 = QHBoxLayout()
         row2.addWidget(self.startDateSlider)
-        row2.addWidget(self.periodSlider)
+        row2.addWidget(self.durationSlider)
 
         for row in [row1, row2]:
             widget = QWidget()
@@ -95,14 +96,18 @@ class App(QMainWindow):
             self.variableDropDown.addItem(self.layout.get_name(var))
 
         self.startDateSlider.setMaximum(len(self.layout.df) - 1)
-        self.periodSlider.setMaximum(len(self.layout.df) - 1)
-        self.periodSlider.setValue(len(self.layout.df))
+        self.durationSlider.setMaximum(len(self.layout.df) - 1)
+        self.durationSlider.setValue(len(self.layout.df))
 
         self.show_plot()
 
     def set_start_date(self, i):
         self.layout.set_start_date(i)
-        self.periodSlider.setMaximum(len(self.layout.df) - i)
+        self.durationSlider.setMaximum(len(self.layout.df) - i - 1)
+        self.show_plot()
+
+    def set_duration(self, i):
+        self.layout.set_duration(i)
         self.show_plot()
 
     def show_plot(self):
