@@ -26,6 +26,7 @@ class App(QMainWindow):
         self.plot.setMinimumWidth(800)
         self.plot.setMinimumHeight(500)
         self.durationSlider = QSlider(orientation=Qt.Horizontal)
+        self.durationSlider.setMinimum(10)
         self.startDateSlider = QSlider(orientation=Qt.Horizontal)
         self.startDateSlider.valueChanged.connect(self.set_start_date)
         self.durationSlider.valueChanged.connect(self.set_duration)
