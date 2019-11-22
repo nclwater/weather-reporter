@@ -38,7 +38,7 @@ class Layout:
         plt.close(f)
 
     def read_dataset(self):
-        self.df = pd.read_csv(self.path, sep='\t', parse_dates=[[0, 1]], header=[0,1])
+        self.df = pd.read_csv(self.path, sep='\t', parse_dates=[[0, 1]], header=[0,1], na_values='---', dayfirst=True)
         self.df = self.df.set_index(self.df.columns[0])
         self.df.index.name = None
         self.df.columns = [' '.join([c.strip() for c in col if 'Unnamed' not in c]).lower() for col in self.df.columns]
