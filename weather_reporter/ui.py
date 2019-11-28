@@ -65,8 +65,6 @@ class App(QMainWindow):
 
         self.df: pd.DataFrame = None
         self.variables: list = None
-        self.start_date: pd.datetime = None
-        self.end_date: pd.datetime = None
         self.variable = None
         self.svg: BytesIO = None
         self.freq = '1H'
@@ -127,7 +125,7 @@ class App(QMainWindow):
         self.svg = BytesIO()
 
         f, ax = plt.subplots(figsize=(9, 6))
-        self.df.loc[self.start_date:self.end_date, self.variable].plot(ax=ax)
+        self.df[self.variable].plot(ax=ax)
         plt.tight_layout()
 
         f.savefig(self.svg, format='svg')
@@ -184,8 +182,6 @@ class App(QMainWindow):
         self.df.columns = [col.replace(' ', '_').replace('.', '') for col in self.df.columns]
         self.variables = self.df.select_dtypes(include=['int', 'float']).columns
         self.variable = self.variables[0]
-        self.start_date = self.df.index[0]
-        self.end_date = self.df.index[-1]
         self.original_df = self.df.copy()
 
         for var in self.variables:
@@ -207,18 +203,6 @@ class App(QMainWindow):
             self.durationDropDown.addItem('Year', 'year')
 
         self.set_frequency()
-
-        self.update_plot()
-
-
-    def set_start_date(self, i):
-        d = len(self.df[self.start_date:self.end_date])
-        self.start_date = self.df.index[i]
-
-        if i + d < len(self.df):
-            self.end_date = self.df.index[i + d]
-        else:
-            self.end_date = self.df.index[-1]
 
         self.update_plot()
 
