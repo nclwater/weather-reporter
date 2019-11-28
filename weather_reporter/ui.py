@@ -1,9 +1,7 @@
 from PyQt5.QtWidgets import QMainWindow, QApplication, QMessageBox, QComboBox, QVBoxLayout, QWidget, QPushButton, \
     QFileDialog, QHBoxLayout
 from PyQt5 import QtSvg
-from PyQt5.QtCore import Qt
 import sys
-import pandas as pd
 import os
 import argparse
 import pandas as pd
@@ -22,7 +20,6 @@ args = parser.parse_args()
 
 
 min_length = 5
-
 
 
 names = {
@@ -55,7 +52,6 @@ names = {
             'iss_recept': '% - RF reception',
             'arc_int': 'Archive Interval (min)'
 }
-
 
 
 class App(QMainWindow):
@@ -98,6 +94,8 @@ class App(QMainWindow):
 
         self.resampleDropDown.activated.connect(self.set_frequency)
 
+        self.dateDropDown.activated.connect(self.update_plot)
+
         row1.addWidget(self.variableDropDown)
         row1.addWidget(self.resampleDropDown)
         row1.addWidget(self.dateDropDown)
@@ -125,7 +123,15 @@ class App(QMainWindow):
         self.svg = BytesIO()
 
         f, ax = plt.subplots(figsize=(9, 6))
-        self.df[self.variable].plot(ax=ax)
+        date = self.dateDropDown.currentData()
+
+        end_index = self.dates.index.get_loc(date)+1
+        if end_index >= len(self.dates):
+            end_date = self.df.index[-1]
+        else:
+            end_date = self.dates.index[end_index]
+
+        self.df.loc[date:end_date, self.variable].plot(ax=ax)
         plt.tight_layout()
 
         f.savefig(self.svg, format='svg')
@@ -134,7 +140,6 @@ class App(QMainWindow):
 
         self.plotWidget.load(self.svg.read())
         self.svg.seek(0)
-        
 
     def create_pdf(self, path):
 
@@ -145,8 +150,6 @@ class App(QMainWindow):
                                 pagesize=landscape(A4))
 
         doc.build([Paragraph(self.get_name(), style=title_style), svg2rlg(self.svg)])
-
-
 
     def get_name(self, variable=None):
 
@@ -202,6 +205,7 @@ class App(QMainWindow):
             self.resampleDropDown.addItem('Monthly', '1M')
             self.durationDropDown.addItem('Year', 'year')
 
+        self.set_duration()
         self.set_frequency()
 
         self.update_plot()
@@ -209,12 +213,12 @@ class App(QMainWindow):
     def set_duration(self):
         duration = self.durationDropDown.currentData()
         periods = getattr(self.df.index.to_series().dt, duration)
-        dates = periods[periods.diff() != 0]
+        self.dates = periods[periods.diff() != 0]
         self.dateDropDown.clear()
-        for date in dates.index:
+        for date in self.dates.index:
             self.dateDropDown.addItem(('{:%d/%m/%Y}' if duration != 'month' else '{:%m/%Y}').format(date), date)
 
-
+        self.update_plot()
 
     def change_variable(self, variable_idx):
 
