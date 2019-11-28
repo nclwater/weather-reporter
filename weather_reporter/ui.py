@@ -132,6 +132,7 @@ class App(QMainWindow):
             end_date = self.dates.index[end_index]
 
         self.df.loc[date:end_date, self.variable].plot(ax=ax)
+        ax.set_ylabel(self.get_name())
         plt.tight_layout()
 
         f.savefig(self.svg, format='svg')
@@ -149,7 +150,11 @@ class App(QMainWindow):
         doc = SimpleDocTemplate(path, rightMargin=0, leftMargin=0, topMargin=0, bottomMargin=0,
                                 pagesize=landscape(A4))
 
-        doc.build([Paragraph(self.get_name(), style=title_style), svg2rlg(self.svg)])
+        doc.build([Paragraph('SHEAR {} Weather Report for the {} of {}'.format(
+            self.resampleDropDown.currentText(),
+            self.durationDropDown.currentText(),
+            self.dateDropDown.currentText()),
+            style=title_style), svg2rlg(self.svg)])
 
     def get_name(self, variable=None):
 
