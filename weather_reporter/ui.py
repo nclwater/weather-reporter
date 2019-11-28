@@ -65,7 +65,9 @@ class App(QMainWindow):
         self.variable = None
         self.svg: BytesIO = None
         self.freq = '1H'
-        self.original_df = None
+        self.df = None
+        self.rain = None
+        self.temp = None
         
         self.setWindowTitle('SHEAR Weather Reporter')
         self.activateWindow()
@@ -124,13 +126,13 @@ class App(QMainWindow):
 
         end_index = self.dates.index.get_loc(date)+1
         if end_index >= len(self.dates):
-            end_date = self.df.index[-1]
+            end_date = self.temp.index[-1]
         else:
             end_date = self.dates.index[end_index]
 
-        df = self.df.loc[date:end_date]
+        df = self.temp.loc[date:end_date]
 
-        ax.plot(df.index, df.temp_out.values, color='firebrick')
+        ax.plot(df.index, df.values, color='firebrick')
 
         ax.set_ylabel('Temperature (C)')
 
@@ -142,12 +144,14 @@ class App(QMainWindow):
 
         twinx.invert_yaxis()
 
+        df = self.rain.loc[date:end_date]
+
         if len(df.index) > 1:
             width = df.index[1] - df.index[0]
         else:
             width = ax.get_xlim()[1] - ax.get_xlim()[0]
 
-        twinx.bar(df.index, df.rain.values, width=width)
+        twinx.bar(df.index, df.values, width=width)
 
         twinx.set_ylabel('Rainfall (mm)')
 
@@ -216,7 +220,6 @@ class App(QMainWindow):
         self.df.columns = [col.replace(' ', '_').replace('.', '') for col in self.df.columns]
         self.variables = self.df.select_dtypes(include=['int', 'float']).columns
         self.variable = self.variables[0]
-        self.original_df = self.df.copy()
 
         duration = self.df.index[-1] - self.df.index[0]
 
@@ -233,6 +236,9 @@ class App(QMainWindow):
             self.resampleDropDown.addItem('Monthly', '1M')
             self.durationDropDown.addItem('Year', 'year')
 
+        self.rain = self.df.rain
+        self.temp = self.df.temp_out
+
         self.set_duration()
         self.set_frequency()
 
@@ -240,7 +246,7 @@ class App(QMainWindow):
 
     def set_duration(self):
         duration = self.durationDropDown.currentData()
-        periods = getattr(self.df.index.to_series().dt, duration)
+        periods = getattr(self.rain.index.to_series().dt, duration)
         self.dates = periods[periods.diff() != 0]
         self.dateDropDown.clear()
         for date in self.dates.index:
@@ -266,7 +272,8 @@ class App(QMainWindow):
         freq = self.resampleDropDown.itemData(self.resampleDropDown.currentIndex())
 
         self.freq = freq
-        self.df = self.original_df.resample(freq).sum()
+        self.rain = self.df.rain.resample(freq).sum()
+        self.temp = self.df.temp_out.resample(freq).mean()
 
         self.update_plot()
 
