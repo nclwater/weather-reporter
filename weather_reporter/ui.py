@@ -141,7 +141,13 @@ class App(QMainWindow):
         twinx = ax.twinx()
 
         twinx.invert_yaxis()
-        twinx.bar(df.index, df.rain.values, width=df.index[1] - df.index[0])
+
+        if len(df.index) > 1:
+            width = df.index[1] - df.index[0]
+        else:
+            width = ax.get_xlim()[1] - ax.get_xlim()[0]
+
+        twinx.bar(df.index, df.rain.values, width=width)
 
         twinx.set_ylabel('Rainfall (mm)')
 
