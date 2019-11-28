@@ -11,6 +11,7 @@ from svglib.svglib import svg2rlg
 from reportlab.lib.pagesizes import A4, landscape
 from reportlab.lib.styles import getSampleStyleSheet
 from io import BytesIO
+import matplotlib.dates as mdates
 
 style = getSampleStyleSheet()
 
@@ -127,8 +128,31 @@ class App(QMainWindow):
         else:
             end_date = self.dates.index[end_index]
 
-        self.df.loc[date:end_date, self.variable].plot(ax=ax)
-        ax.set_ylabel(self.get_name())
+        df = self.df.loc[date:end_date]
+
+        ax.plot(df.index, df.temp_out.values, color='firebrick')
+
+        ax.set_ylabel('Temperature (C)')
+
+        ymin, ymax = ax.get_ylim()
+        ymax = ymax + ymax - ymin
+        ax.set_ylim(ymin, ymax)
+
+        twinx = ax.twinx()
+
+        twinx.invert_yaxis()
+        twinx.bar(df.index, df.rain.values, width=df.index[1] - df.index[0])
+
+        twinx.set_ylabel('Rainfall (mm)')
+
+        ymax, ymin = twinx.get_ylim()
+        ymax = ymax + ymax - ymin
+        twinx.set_ylim(ymax, ymin)
+
+        locator = mdates.AutoDateLocator()
+        ax.xaxis.set_major_locator(locator)
+        ax.xaxis.set_major_formatter(mdates.ConciseDateFormatter(locator))
+
         plt.tight_layout()
 
         f.savefig(self.svg, format='svg')
