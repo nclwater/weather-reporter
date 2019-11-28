@@ -86,7 +86,6 @@ class App(QMainWindow):
 
         self.setCentralWidget(self.mainWidget)
 
-        self.variableDropDown = QComboBox()
         self.resampleDropDown = QComboBox()
         self.dateDropDown = QComboBox()
         self.durationDropDown = QComboBox()
@@ -96,7 +95,6 @@ class App(QMainWindow):
 
         self.dateDropDown.activated.connect(self.update_plot)
 
-        row1.addWidget(self.variableDropDown)
         row1.addWidget(self.resampleDropDown)
         row1.addWidget(self.dateDropDown)
         row1.addWidget(self.durationDropDown)
@@ -109,8 +107,6 @@ class App(QMainWindow):
             self.mainLayout.addWidget(widget)
         self.mainLayout.addWidget(self.plotWidget)
         self.mainLayout.addWidget(self.saveButton)
-
-        self.variableDropDown.activated.connect(self.change_variable)
 
         if args.f is not None:
             self.path = args.f
@@ -191,9 +187,6 @@ class App(QMainWindow):
         self.variables = self.df.select_dtypes(include=['int', 'float']).columns
         self.variable = self.variables[0]
         self.original_df = self.df.copy()
-
-        for var in self.variables:
-            self.variableDropDown.addItem(self.get_name(var))
 
         duration = self.df.index[-1] - self.df.index[0]
 
