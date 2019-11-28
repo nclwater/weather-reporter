@@ -96,6 +96,7 @@ class App(QMainWindow):
         self.resampleDropDown = QComboBox()
         self.dateDropDown = QComboBox()
         self.durationDropDown = QComboBox()
+        self.durationDropDown.activated.connect(self.set_duration)
 
         self.resampleDropDown.activated.connect(self.set_frequency)
 
@@ -221,11 +222,14 @@ class App(QMainWindow):
 
         self.update_plot()
 
-    def set_duration(self, i):
-        df = self.df[self.start_date:]
-        self.end_date = self.df.index[self.df.index.get_loc(self.start_date) + i]
-        self.set_start_date(df.index.get_loc(self.start_date))
-        self.update_plot()
+    def set_duration(self):
+        duration = self.durationDropDown.currentData()
+        periods = getattr(self.df.index.to_series().dt, duration)
+        dates = periods[periods.diff() != 0]
+        self.dateDropDown.clear()
+        for date in dates.index:
+            self.dateDropDown.addItem(('{:%d/%m/%Y}' if duration != 'month' else '{:%m/%Y}').format(date), date)
+
 
 
     def change_variable(self, variable_idx):
