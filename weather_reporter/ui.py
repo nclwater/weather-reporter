@@ -199,6 +199,9 @@ class App(QMainWindow):
             self.resampleDropDown.addItem('Weekly', '1W')
         if duration > pd.Timedelta(days=31 * min_length):
             self.resampleDropDown.addItem('Monthly', '1M')
+
+        self.set_frequency()
+
         self.update_plot()
 
 
@@ -239,6 +242,7 @@ class App(QMainWindow):
 
         self.freq = freq
         self.df = self.original_df.resample(freq).sum()
+
         self.update_plot()
 
 
