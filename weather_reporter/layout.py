@@ -70,12 +70,19 @@ class Layout:
         self.update_plot()
 
     def set_start_date(self, i):
+        d = len(self.df[self.start_date:self.end_date])
         self.start_date = self.df.index[i]
+
+        if i + d < len(self.df):
+            self.end_date = self.df.index[i+d]
+        else:
+            self.end_date = self.df.index[-1]
+
         self.update_plot()
 
     def set_duration(self, i):
         df = self.df[self.start_date:]
-        self.end_date = df.index[df.index.get_loc(self.start_date) + i]
+        self.set_start_date(df.index.get_loc(self.start_date))
         self.update_plot()
 
     def get_name(self, variable=None):

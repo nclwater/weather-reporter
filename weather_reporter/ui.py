@@ -13,6 +13,9 @@ parser.add_argument('-f')
 args = parser.parse_args()
 
 
+min_length = 5
+
+
 class App(QMainWindow):
 
     def __init__(self):
@@ -26,7 +29,7 @@ class App(QMainWindow):
         self.plot.setMinimumWidth(800)
         self.plot.setMinimumHeight(500)
         self.durationSlider = QSlider(orientation=Qt.Horizontal)
-        self.durationSlider.setMinimum(10)
+        self.durationSlider.setMinimum(min_length)
         self.startDateSlider = QSlider(orientation=Qt.Horizontal)
         self.startDateSlider.valueChanged.connect(self.set_start_date)
         self.durationSlider.valueChanged.connect(self.set_duration)
@@ -45,8 +48,6 @@ class App(QMainWindow):
 
         self.variableDropDown = QComboBox()
         self.resampleDropDown = QComboBox()
-        for freq, name in [('1H', 'Hourly'), ('1D', 'Daily'), ('1W', 'Weekly'), ('1M', 'Monthly')]:
-            self.resampleDropDown.addItem(name, freq)
 
         self.resampleDropDown.activated.connect(self.set_frequency)
 
@@ -96,9 +97,20 @@ class App(QMainWindow):
         for var in self.layout.variables:
             self.variableDropDown.addItem(self.layout.get_name(var))
 
-        self.startDateSlider.setMaximum(len(self.layout.df) - 1)
+        self.startDateSlider.setMaximum(len(self.layout.df) - min_length)
         self.durationSlider.setMaximum(len(self.layout.df) - 1)
         self.durationSlider.setValue(len(self.layout.df))
+
+        duration = self.layout.df.index[-1] - self.layout.df.index[0]
+
+        if duration > pd.Timedelta(hours=min_length):
+            self.resampleDropDown.addItem('Hourly', '1H')
+        if duration > pd.Timedelta(days=min_length):
+            self.resampleDropDown.addItem('Daily', '1D')
+        if duration > pd.Timedelta(weeks=min_length):
+            self.resampleDropDown.addItem('Weekly', '1W')
+        if duration > pd.Timedelta(days=31 * min_length):
+            self.resampleDropDown.addItem('Monthly', '1M')
 
         self.show_plot()
 
@@ -125,8 +137,17 @@ class App(QMainWindow):
             self.layout.create_pdf(dialog[0])
 
     def set_frequency(self):
+
+        start_date = self.layout.df.index[self.startDateSlider.value()]
+
         freq = self.resampleDropDown.itemData(self.resampleDropDown.currentIndex())
         self.layout.set_frequency(freq)
+        self.startDateSlider.setMaximum(len(self.layout.df) - min_length)
+
+        df = self.layout.df
+
+        self.startDateSlider.setValue(df.index.get_loc((df.index.to_series() - start_date).idxmin()))
+
         self.show_plot()
 
 
