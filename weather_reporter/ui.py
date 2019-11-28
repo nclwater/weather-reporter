@@ -1,5 +1,5 @@
 from PyQt5.QtWidgets import QMainWindow, QApplication, QMessageBox, QComboBox, QVBoxLayout, QWidget, QPushButton, \
-    QFileDialog, QHBoxLayout, QSlider
+    QFileDialog, QHBoxLayout
 from PyQt5 import QtSvg
 from PyQt5.QtCore import Qt
 import sys
@@ -79,11 +79,6 @@ class App(QMainWindow):
         self.plotWidget = QtSvg.QSvgWidget()
         self.plotWidget.setMinimumWidth(800)
         self.plotWidget.setMinimumHeight(500)
-        self.durationSlider = QSlider(orientation=Qt.Horizontal)
-        self.durationSlider.setMinimum(min_length)
-        self.startDateSlider = QSlider(orientation=Qt.Horizontal)
-        self.startDateSlider.valueChanged.connect(self.set_start_date)
-        self.durationSlider.valueChanged.connect(self.set_duration)
 
         row1 = QHBoxLayout()
 
@@ -106,8 +101,6 @@ class App(QMainWindow):
         row1.addWidget(self.resampleDropDown)
 
         row2 = QHBoxLayout()
-        row2.addWidget(self.startDateSlider)
-        row2.addWidget(self.durationSlider)
 
         for row in [row1, row2]:
             widget = QWidget()
@@ -193,9 +186,6 @@ class App(QMainWindow):
         for var in self.variables:
             self.variableDropDown.addItem(self.get_name(var))
 
-        self.startDateSlider.setMaximum(len(self.df) - min_length)
-        self.durationSlider.setMaximum(len(self.df) - 1)
-        self.durationSlider.setValue(len(self.df))
 
         duration = self.df.index[-1] - self.df.index[0]
 
@@ -218,7 +208,6 @@ class App(QMainWindow):
             self.end_date = self.df.index[i + d]
         else:
             self.end_date = self.df.index[-1]
-        self.durationSlider.setMaximum(len(self.df) - i - 1)
 
         self.update_plot()
 
@@ -244,21 +233,11 @@ class App(QMainWindow):
 
     def set_frequency(self):
 
-        start_date = self.df.index[self.startDateSlider.value()]
-
         freq = self.resampleDropDown.itemData(self.resampleDropDown.currentIndex())
 
         self.freq = freq
         self.df = self.original_df.resample(freq).sum()
         self.update_plot()
-
-        self.startDateSlider.setMaximum(len(self.df) - min_length)
-
-        df = self.df
-
-        self.startDateSlider.setValue(df.index.get_loc((df.index.to_series() - start_date).idxmin()))
-
-        self.show_plot()
 
 
 if __name__ == '__main__':
