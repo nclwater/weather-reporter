@@ -194,16 +194,16 @@ class App(QMainWindow):
 
         if duration > pd.Timedelta(hours=min_length):
             self.resampleDropDown.addItem('Hourly', '1H')
-            self.durationDropDown.addItem('Day', '1D')
+            self.durationDropDown.addItem('Day', 'day')
         if duration > pd.Timedelta(days=min_length):
             self.resampleDropDown.addItem('Daily', '1D')
-            self.durationDropDown.addItem('Week', '1W')
-            self.durationDropDown.addItem('Month', '1M')
+            self.durationDropDown.addItem('Week', 'week')
+            self.durationDropDown.addItem('Month', 'month')
         if duration > pd.Timedelta(weeks=min_length):
             self.resampleDropDown.addItem('Weekly', '1W')
         if duration > pd.Timedelta(days=31 * min_length):
             self.resampleDropDown.addItem('Monthly', '1M')
-            self.durationDropDown.addItem('Year', '1A')
+            self.durationDropDown.addItem('Year', 'year')
 
         self.set_frequency()
 
