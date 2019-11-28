@@ -94,11 +94,13 @@ class App(QMainWindow):
 
         self.variableDropDown = QComboBox()
         self.resampleDropDown = QComboBox()
+        self.dateDropDown = QComboBox()
 
         self.resampleDropDown.activated.connect(self.set_frequency)
 
         row1.addWidget(self.variableDropDown)
         row1.addWidget(self.resampleDropDown)
+        row1.addWidget(self.dateDropDown)
 
         row2 = QHBoxLayout()
 
