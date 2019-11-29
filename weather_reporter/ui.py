@@ -1,5 +1,5 @@
 from PyQt5.QtWidgets import QMainWindow, QApplication, QMessageBox, QComboBox, QVBoxLayout, QWidget, QPushButton, \
-    QFileDialog, QHBoxLayout
+    QFileDialog, QHBoxLayout, QLabel
 from PyQt5 import QtSvg
 import sys
 import os
@@ -61,6 +61,12 @@ class App(QMainWindow):
         self.durationDropDown = QComboBox()
         self.durationDropDown.activated.connect(self.set_duration)
 
+        self.dropWidget = QLabel('Drop a Davis WeatherLink export file here')
+        self.dropWidget.setStyleSheet("margin:5px; border:1px dashed rgb(0, 0, 0); padding:10px")
+
+        self.showWidgets(False)
+
+
         self.resampleDropDown.activated.connect(self.set_frequency)
 
         self.dateDropDown.activated.connect(self.update_plot)
@@ -68,6 +74,7 @@ class App(QMainWindow):
         row1.addWidget(self.resampleDropDown)
         row1.addWidget(self.dateDropDown)
         row1.addWidget(self.durationDropDown)
+        row1.addWidget(self.dropWidget)
 
         row2 = QHBoxLayout()
 
@@ -81,6 +88,14 @@ class App(QMainWindow):
         if args.f is not None:
             self.path = args.f
             self.add_data()
+
+    def showWidgets(self, show: bool):
+        self.dateDropDown.setVisible(show)
+        self.durationDropDown.setVisible(show)
+        self.resampleDropDown.setVisible(show)
+        self.plotWidget.setVisible(show)
+        self.saveButton.setVisible(show)
+        self.dropWidget.setVisible(not show)
         
     def update_plot(self):
 
@@ -199,6 +214,8 @@ class App(QMainWindow):
         self.set_frequency()
 
         self.update_plot()
+
+        self.showWidgets(True)
 
     def set_duration(self):
         duration = self.durationDropDown.currentData()
