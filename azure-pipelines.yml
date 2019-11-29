@@ -25,13 +25,13 @@ steps:
 
 - script: |
     call activate
-    python -m unittest tests/test_layout.py
-  displayName: Test layout.py
+    python -m unittest tests/test_ui.py
+  displayName: Test UI
 
 - task: PublishPipelineArtifact@1
   inputs:
-    targetPath: 'tests/outputs/temp_out.pdf'
-    artifactName: 'temp_out.pdf'
+    targetPath: 'tests/outputs/output.pdf'
+    artifactName: 'output.pdf'
 
 - script: |
     call activate
