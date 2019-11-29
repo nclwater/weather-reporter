@@ -1,5 +1,6 @@
 from PyQt5.QtWidgets import QMainWindow, QApplication, QMessageBox, QComboBox, QVBoxLayout, QWidget, QPushButton, \
     QFileDialog, QHBoxLayout, QLabel
+from pandas.plotting import register_matplotlib_converters
 from PyQt5 import QtSvg, QtCore
 import sys
 import os
@@ -14,6 +15,7 @@ from io import BytesIO
 import matplotlib.dates as mdates
 
 style = getSampleStyleSheet()
+register_matplotlib_converters()
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-f')
