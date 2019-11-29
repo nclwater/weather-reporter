@@ -25,7 +25,7 @@ steps:
 
 - script: |
     call activate
-    python -m unittest tests/test_ui.py
+    python -m unittest -f tests/test_ui.py
   displayName: Test UI
 
 - task: PublishPipelineArtifact@1
