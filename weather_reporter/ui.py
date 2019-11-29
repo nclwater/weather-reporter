@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import QMainWindow, QApplication, QMessageBox, QComboBox, QVBoxLayout, QWidget, QPushButton, \
     QFileDialog, QHBoxLayout, QLabel
-from PyQt5 import QtSvg
+from PyQt5 import QtSvg, QtCore
 import sys
 import os
 import argparse
@@ -82,6 +82,8 @@ class App(QMainWindow):
             widget = QWidget()
             widget.setLayout(row)
             self.mainLayout.addWidget(widget)
+
+        self.mainLayout.setAlignment(QtCore.Qt.AlignCenter)
         self.mainLayout.addWidget(self.plotWidget)
         self.mainLayout.addWidget(self.saveButton)
 
