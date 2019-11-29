@@ -1,7 +1,8 @@
 import unittest
-from weather_reporter import Layout
+from weather_reporter.ui import App
 import os
-import pandas as pd
+from PyQt5.QtWidgets import QApplication
+import sys
 
 tests = os.path.dirname(__file__)
 sample_data_folder = os.path.join(tests, 'sample_data')
@@ -10,28 +11,33 @@ outputs = os.path.join(tests, 'outputs')
 if not os.path.exists(outputs):
     os.mkdir(outputs)
 
-layout = Layout(sample_data)
+app = QApplication(sys.argv)
+
 
 class TestLayout(unittest.TestCase):
+    def setUp(self):
+        self.app = App()
+        self.app.path = sample_data
+        self.app.add_data()
 
-    def test_temperature(self):
-        layout.set_variable('temp_out')
-        layout.create_pdf(os.path.join(outputs, 'temp_out.pdf'))
+    def test_set_duration(self):
+        self.app.durationDropDown.setCurrentIndex(1)
+        self.app.set_duration()
 
-    def test_incompatible_file(self):
-        self.assertRaises(pd.errors.ParserError, lambda: Layout(os.path.join(sample_data_folder, 'incompatible.txt')))
-
-    def test_update_plot(self):
-        layout.update_plot()
-
-    def test_set_variable(self):
-        layout.set_variable('temp_out')
+    def test_set_date(self):
+        self.app.dateDropDown.setCurrentIndex(1)
+        self.app.update_plot()
 
     def test_set_frequency(self):
-        layout.set_frequency('1D')
+        self.app.resampleDropDown.setCurrentIndex(1)
+        self.app.set_frequency()
 
-    def test_create_pdf(self):
-        layout.create_pdf('tests/test.pdf')
+    def test_end_date_too_late(self):
+        self.app.dateDropDown.setCurrentIndex(self.app.dateDropDown.count()-1)
+        self.app.update_plot()
+
+    def test_save_pdf(self):
+        self.app.create_pdf(os.path.join(outputs, 'output.pdf'))
 
 
 

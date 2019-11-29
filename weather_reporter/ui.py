@@ -29,8 +29,6 @@ class App(QMainWindow):
         super().__init__()
 
         self.df: pd.DataFrame = None
-        self.variables: list = None
-        self.variable = None
         self.svg: BytesIO = None
         self.freq = '1H'
         self.df = None
@@ -83,8 +81,6 @@ class App(QMainWindow):
         if args.f is not None:
             self.path = args.f
             self.add_data()
-
-        self.show()
         
     def update_plot(self):
 
@@ -180,8 +176,6 @@ class App(QMainWindow):
         self.df.index.name = None
         self.df.columns = [' '.join([c.strip() for c in col if 'Unnamed' not in c]).lower() for col in self.df.columns]
         self.df.columns = [col.replace(' ', '_').replace('.', '') for col in self.df.columns]
-        self.variables = self.df.select_dtypes(include=['int', 'float']).columns
-        self.variable = self.variables[0]
 
         duration = self.df.index[-1] - self.df.index[0]
 
@@ -216,14 +210,6 @@ class App(QMainWindow):
 
         self.update_plot()
 
-    def change_variable(self, variable_idx):
-
-        variable = self.variables[variable_idx]
-
-        assert variable in self.variables, '{} not available'.format(variable)
-        self.variable = variable
-        self.update_plot()
-
     def save(self):
         dialog = QFileDialog.getSaveFileName(filter="PDF Files (*.pdf)")
         if dialog[0] != '':
@@ -243,4 +229,5 @@ class App(QMainWindow):
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     ex = App()
+    ex.show()
     sys.exit(app.exec_())
