@@ -218,8 +218,16 @@ class App(QMainWindow):
         periods = getattr(self.rain.index.to_series().dt, duration)
         self.dates = periods[periods.diff() != 0]
         self.dateDropDown.clear()
+
+        if duration == 'month':
+            date_string = '{:%m/%Y}'
+        elif duration == 'year':
+            date_string = '{:%Y}'
+        else:
+            date_string = '{:%d/%m/%Y}'
+
         for date in self.dates.index:
-            self.dateDropDown.addItem(('{:%d/%m/%Y}' if duration != 'month' else '{:%m/%Y}').format(date.start_time), date)
+            self.dateDropDown.addItem(date_string.format(date.start_time), date)
 
         self.update_plot()
 
