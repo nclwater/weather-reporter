@@ -124,7 +124,7 @@ class App(QMainWindow):
 
         rain = self.rain.loc[date:end_date].iloc[:-1]
 
-        width = rain.index.freq.delta
+        width = rain.index.end_time - rain.index.start_time
 
         twinx.bar(rain.index.start_time, rain.values, width=width, align='edge')
 
