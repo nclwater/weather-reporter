@@ -235,8 +235,8 @@ class App(QMainWindow):
         freq = self.resampleDropDown.itemData(self.resampleDropDown.currentIndex())
 
         self.freq = freq
-        self.rain = self.df.rain.resample(freq).sum()
-        self.temp = self.df.temp_out.resample(freq).mean()
+        self.rain = self.df.rain.resample(freq, label='right').sum()
+        self.temp = self.df.temp_out.resample(freq, label='right').mean()
 
         self.update_plot()
 
