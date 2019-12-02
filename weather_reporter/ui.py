@@ -129,7 +129,7 @@ class App(QMainWindow):
         else:
             width = ax.get_xlim()[1] - ax.get_xlim()[0]
 
-        twinx.bar(df.index, df.values, width=width)
+        twinx.bar(df.index, df.values, width=width, align='edge')
 
         twinx.set_ylabel('Rainfall (mm)')
 
@@ -235,8 +235,8 @@ class App(QMainWindow):
         freq = self.resampleDropDown.itemData(self.resampleDropDown.currentIndex())
 
         self.freq = freq
-        self.rain = self.df.rain.resample(freq, label='right').sum()
-        self.temp = self.df.temp_out.resample(freq, label='right').mean()
+        self.rain = self.df.rain.resample(freq, label='left').sum()
+        self.temp = self.df.temp_out.resample(freq, label='left').mean()
 
         self.update_plot()
 
