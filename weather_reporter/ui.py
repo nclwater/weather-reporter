@@ -124,10 +124,7 @@ class App(QMainWindow):
 
         rain = self.rain.loc[date:end_date].iloc[:-1]
 
-        if len(rain.index) > 1:
-            width = rain.index[1] - rain.index[0]
-        else:
-            width = ax.get_xlim()[1] - ax.get_xlim()[0]
+        width = temp.index[1] - temp.index[0]
 
         twinx.bar(rain.index, rain.values, width=width, align='edge')
 
