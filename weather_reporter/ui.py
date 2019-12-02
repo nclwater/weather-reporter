@@ -110,7 +110,7 @@ class App(QMainWindow):
 
         temp = self.temp.loc[date:end_date]
 
-        ax.plot(temp.index, temp.values, color='firebrick')
+        ax.plot(temp.index.start_time, temp.values, color='firebrick')
 
         ax.set_ylabel('Temperature (C)')
 
@@ -124,9 +124,9 @@ class App(QMainWindow):
 
         rain = self.rain.loc[date:end_date].iloc[:-1]
 
-        width = temp.index[1] - temp.index[0]
+        width = rain.index.freq.delta
 
-        twinx.bar(rain.index, rain.values, width=width, align='edge')
+        twinx.bar(rain.index.start_time, rain.values, width=width, align='edge')
 
         twinx.set_ylabel('Rainfall (mm)')
 
@@ -184,10 +184,11 @@ class App(QMainWindow):
         self.df = pd.read_csv(self.path, sep='\t', parse_dates=[[0, 1]], header=[0, 1], na_values='---', dayfirst=True)
         self.df = self.df.set_index(self.df.columns[0])
         self.df.index.name = None
+        self.df.index = self.df.index.to_period('1H')
         self.df.columns = [' '.join([c.strip() for c in col if 'Unnamed' not in c]).lower() for col in self.df.columns]
         self.df.columns = [col.replace(' ', '_').replace('.', '') for col in self.df.columns]
 
-        duration = self.df.index[-1] - self.df.index[0]
+        duration = self.df.index[-1].end_time - self.df.index[0].start_time
 
         if duration > pd.Timedelta(hours=min_length):
             self.resampleDropDown.addItem('Hourly', '1H')
@@ -218,7 +219,7 @@ class App(QMainWindow):
         self.dates = periods[periods.diff() != 0]
         self.dateDropDown.clear()
         for date in self.dates.index:
-            self.dateDropDown.addItem(('{:%d/%m/%Y}' if duration != 'month' else '{:%m/%Y}').format(date), date)
+            self.dateDropDown.addItem(('{:%d/%m/%Y}' if duration != 'month' else '{:%m/%Y}').format(date.start_time), date)
 
         self.update_plot()
 
@@ -232,8 +233,8 @@ class App(QMainWindow):
         freq = self.resampleDropDown.itemData(self.resampleDropDown.currentIndex())
 
         self.freq = freq
-        self.rain = self.df.rain.resample(freq, label='left').sum()
-        self.temp = self.df.temp_out.resample(freq, label='left').mean()
+        self.rain = self.df.rain.resample(freq).sum()
+        self.temp = self.df.temp_out.resample(freq).mean()
 
         self.update_plot()
 
