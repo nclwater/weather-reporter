@@ -108,9 +108,9 @@ class App(QMainWindow):
         else:
             end_date = self.dates.index[end_index]
 
-        df = self.temp.loc[date:end_date]
+        temp = self.temp.loc[date:end_date]
 
-        ax.plot(df.index, df.values, color='firebrick')
+        ax.plot(temp.index, temp.values, color='firebrick')
 
         ax.set_ylabel('Temperature (C)')
 
@@ -122,14 +122,14 @@ class App(QMainWindow):
 
         twinx.invert_yaxis()
 
-        df = self.rain.loc[date:end_date]
+        rain = self.rain.loc[date:end_date].iloc[:-1]
 
-        if len(df.index) > 1:
-            width = df.index[1] - df.index[0]
+        if len(rain.index) > 1:
+            width = rain.index[1] - rain.index[0]
         else:
             width = ax.get_xlim()[1] - ax.get_xlim()[0]
 
-        twinx.bar(df.index, df.values, width=width, align='edge')
+        twinx.bar(rain.index, rain.values, width=width, align='edge')
 
         twinx.set_ylabel('Rainfall (mm)')
 
