@@ -1,7 +1,7 @@
 from PyQt5.QtWidgets import QMainWindow, QApplication, QMessageBox, QComboBox, QVBoxLayout, QWidget, QPushButton, \
     QFileDialog, QHBoxLayout, QLabel
 from pandas.plotting import register_matplotlib_converters
-from PyQt5 import QtSvg, QtCore
+from PyQt5 import QtSvg, QtCore, QtGui
 import sys
 import os
 import argparse
@@ -62,14 +62,26 @@ class App(QMainWindow):
         self.dropWidget = QLabel('Drop a Davis WeatherLink export file here')
         self.dropWidget.setStyleSheet("margin:5px; border:1px dashed rgb(0, 0, 0); padding:10px")
 
+        self.resampleLabel = QLabel('Resolution:')
+        self.dateLabel = QLabel('Date:')
+        self.durationLabel = QLabel('Duration:')
+
+        font = QtGui.QFont("Times", 12, QtGui.QFont.Normal)
+        for label in [self.resampleLabel, self.dateLabel, self.durationLabel]:
+            label.setAlignment(QtCore.Qt.AlignRight)
+            label.setFont(font)
+
         self.showWidgets(False)
 
         self.resampleDropDown.activated.connect(self.set_frequency)
 
         self.dateDropDown.activated.connect(self.update_plot)
 
+        row1.addWidget(self.resampleLabel)
         row1.addWidget(self.resampleDropDown)
+        row1.addWidget(self.dateLabel)
         row1.addWidget(self.dateDropDown)
+        row1.addWidget(self.durationLabel)
         row1.addWidget(self.durationDropDown)
         row1.addWidget(self.dropWidget)
 
@@ -93,6 +105,9 @@ class App(QMainWindow):
         self.resampleDropDown.setVisible(show)
         self.plotWidget.setVisible(show)
         self.saveButton.setVisible(show)
+        self.dateLabel.setVisible(show)
+        self.durationLabel.setVisible(show)
+        self.resampleLabel.setVisible(show)
         self.dropWidget.setVisible(not show)
         
     def update_plot(self):
