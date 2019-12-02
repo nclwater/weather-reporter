@@ -17,17 +17,13 @@ import matplotlib.dates as mdates
 style = getSampleStyleSheet()
 register_matplotlib_converters()
 
-parser = argparse.ArgumentParser()
-parser.add_argument('-f')
-args = parser.parse_args()
-
 
 min_length = 5
 
 
 class App(QMainWindow):
 
-    def __init__(self):
+    def __init__(self, path=None):
         super().__init__()
 
         self.df: pd.DataFrame = None
@@ -41,7 +37,7 @@ class App(QMainWindow):
         self.setWindowTitle('SHEAR Weather Reporter')
         self.activateWindow()
         self.setAcceptDrops(True)
-        self.path = None
+        self.path = path
         self.plotWidget = QtSvg.QSvgWidget()
         self.plotWidget.setMinimumWidth(800)
         self.plotWidget.setMinimumHeight(500)
@@ -68,7 +64,6 @@ class App(QMainWindow):
 
         self.showWidgets(False)
 
-
         self.resampleDropDown.activated.connect(self.set_frequency)
 
         self.dateDropDown.activated.connect(self.update_plot)
@@ -89,8 +84,7 @@ class App(QMainWindow):
         self.mainLayout.addWidget(self.plotWidget)
         self.mainLayout.addWidget(self.saveButton)
 
-        if args.f is not None:
-            self.path = args.f
+        if self.path is not None:
             self.add_data()
 
     def showWidgets(self, show: bool):
@@ -248,7 +242,11 @@ class App(QMainWindow):
 
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-f')
+    args = parser.parse_args()
+
     app = QApplication(sys.argv)
-    ex = App()
+    ex = App(args.f)
     ex.show()
     sys.exit(app.exec_())
