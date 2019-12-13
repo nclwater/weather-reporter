@@ -79,10 +79,10 @@ class App(QMainWindow):
 
         row1.addWidget(self.resampleLabel)
         row1.addWidget(self.resampleDropDown)
-        row1.addWidget(self.dateLabel)
-        row1.addWidget(self.dateDropDown)
         row1.addWidget(self.durationLabel)
         row1.addWidget(self.durationDropDown)
+        row1.addWidget(self.dateLabel)
+        row1.addWidget(self.dateDropDown)
         row1.addWidget(self.dropWidget)
 
         row2 = QHBoxLayout()
