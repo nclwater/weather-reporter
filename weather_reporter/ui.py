@@ -1,5 +1,5 @@
 from PyQt5.QtWidgets import QMainWindow, QApplication, QMessageBox, QComboBox, QVBoxLayout, QWidget, QPushButton, \
-    QFileDialog, QHBoxLayout, QLabel
+    QFileDialog, QHBoxLayout, QLabel, QLineEdit
 from pandas.plotting import register_matplotlib_converters
 from PyQt5 import QtSvg, QtCore, QtGui
 import sys
@@ -34,6 +34,7 @@ class App(QMainWindow):
         self.temp = None
         self.dates = None
         self.title = None
+        self.location = None
         
         self.setWindowTitle('SHEAR Weather Reporter')
         self.activateWindow()
@@ -81,6 +82,9 @@ class App(QMainWindow):
         self.dateDropDown = QComboBox()
         self.durationDropDown = QComboBox()
         self.durationDropDown.activated.connect(self.set_duration)
+        self.locationTextBox = QLineEdit()
+        self.locationTextBox.textChanged.connect(self.update_location)
+        self.locationTextBoxLabel = QLabel('Location:')
 
         self.dropWidget = QLabel('Drop a Davis WeatherLink export file here')
         self.dropWidget.setStyleSheet("margin:5px; border:1px dashed rgb(0, 0, 0); padding:10px")
@@ -90,7 +94,7 @@ class App(QMainWindow):
         self.durationLabel = QLabel('Duration:')
 
         font = QtGui.QFont("Times", 12, QtGui.QFont.Normal)
-        for label in [self.resampleLabel, self.dateLabel, self.durationLabel]:
+        for label in [self.resampleLabel, self.dateLabel, self.durationLabel, self.locationTextBoxLabel]:
             label.setAlignment(QtCore.Qt.AlignRight)
             label.setFont(font)
 
@@ -107,6 +111,8 @@ class App(QMainWindow):
         row1.addWidget(self.dateLabel)
         row1.addWidget(self.dateDropDown)
         row1.addWidget(self.dropWidget)
+        row1.addWidget(self.locationTextBoxLabel)
+        row1.addWidget(self.locationTextBox)
 
         row2 = QHBoxLayout()
 
@@ -128,6 +134,11 @@ class App(QMainWindow):
 
         if self.path is not None:
             self.add_data()
+
+    def update_location(self):
+        self.location = self.locationTextBox.text()
+        if self.df is not None:
+            self.update_plot()
 
     def showWidgets(self, show: bool):
         self.dateDropDown.setVisible(show)
@@ -192,8 +203,9 @@ class App(QMainWindow):
         self.plotWidget.load(self.svg.read())
         self.svg.seek(0)
 
-        self.title = 'SHEAR {} Weather Report for the {} of {}'.format(
+        self.title = '{} Weather at {} for the {} of {}'.format(
             self.resampleDropDown.currentText(),
+            self.location.title(),
             self.durationDropDown.currentText(),
             self.dateDropDown.currentText())
 
@@ -250,6 +262,8 @@ class App(QMainWindow):
 
     def add_data(self):
 
+        self.location = os.path.splitext(os.path.basename(self.path))[0]
+        self.locationTextBox.setText(self.location)
         self.df = pd.read_csv(self.path, sep='\t', parse_dates=[[0, 1]], header=[0, 1], na_values='---', dayfirst=True)
         self.df = self.df.set_index(self.df.columns[0])
         self.df.index.name = None
