@@ -40,9 +40,13 @@ class App(QMainWindow):
         self.activateWindow()
         self.setAcceptDrops(True)
         self.path = path
+        plotWidget = QWidget()
+        plotWidgetLayout = QHBoxLayout()
+        plotWidget.setLayout(plotWidgetLayout)
         self.plotWidget = QtSvg.QSvgWidget()
-        self.plotWidget.setMinimumWidth(800)
-        self.plotWidget.setMinimumHeight(500)
+        self.plotWidget.setFixedWidth(800)
+        self.plotWidget.setFixedHeight(500)
+        plotWidgetLayout.addWidget(self.plotWidget)
 
         self.plotTitleWidget = QLabel()
         self.plotTitleWidget.setFont(QtGui.QFont("Times", 20, QtGui.QFont.Bold))
@@ -128,7 +132,7 @@ class App(QMainWindow):
         title_layout.setAlignment(QtCore.Qt.AlignCenter)
         title.setLayout(title_layout)
         self.mainLayout.addWidget(title)
-        self.mainLayout.addWidget(self.plotWidget)
+        self.mainLayout.addWidget(plotWidget)
         self.mainLayout.addWidget(self.saveButton)
         self.mainLayout.addWidget(self.logosWidget)
 
