@@ -33,6 +33,7 @@ class App(QMainWindow):
         self.rain = None
         self.temp = None
         self.dates = None
+        self.title = None
         
         self.setWindowTitle('SHEAR Weather Reporter')
         self.activateWindow()
@@ -41,6 +42,9 @@ class App(QMainWindow):
         self.plotWidget = QtSvg.QSvgWidget()
         self.plotWidget.setMinimumWidth(800)
         self.plotWidget.setMinimumHeight(500)
+
+        self.plotTitleWidget = QLabel()
+        self.plotTitleWidget.setFont(QtGui.QFont("Times", 20, QtGui.QFont.Bold))
 
         self.logosWidget = QWidget()
         layout = QHBoxLayout()
@@ -110,6 +114,12 @@ class App(QMainWindow):
             self.mainLayout.addWidget(widget)
 
         self.mainLayout.setAlignment(QtCore.Qt.AlignCenter)
+        title = QWidget()
+        title_layout = QHBoxLayout()
+        title_layout.addWidget(self.plotTitleWidget)
+        title_layout.setAlignment(QtCore.Qt.AlignCenter)
+        title.setLayout(title_layout)
+        self.mainLayout.addWidget(title)
         self.mainLayout.addWidget(self.plotWidget)
         self.mainLayout.addWidget(self.saveButton)
         self.mainLayout.addWidget(self.logosWidget)
@@ -180,6 +190,13 @@ class App(QMainWindow):
         self.plotWidget.load(self.svg.read())
         self.svg.seek(0)
 
+        self.title = 'SHEAR {} Weather Report for the {} of {}'.format(
+            self.resampleDropDown.currentText(),
+            self.durationDropDown.currentText(),
+            self.dateDropDown.currentText())
+
+        self.plotTitleWidget.setText(self.title)
+
     def create_pdf(self, path):
 
         title_style = style['h1']
@@ -188,10 +205,7 @@ class App(QMainWindow):
         doc = SimpleDocTemplate(path, rightMargin=0, leftMargin=0, topMargin=0, bottomMargin=0,
                                 pagesize=landscape(A4))
 
-        doc.build([Paragraph('SHEAR {} Weather Report for the {} of {}'.format(
-            self.resampleDropDown.currentText(),
-            self.durationDropDown.currentText(),
-            self.dateDropDown.currentText()),
+        doc.build([Paragraph(self.title,
             style=title_style), svg2rlg(self.svg)])
 
     def dragEnterEvent(self, event):
