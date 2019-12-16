@@ -42,6 +42,23 @@ class App(QMainWindow):
         self.plotWidget.setMinimumWidth(800)
         self.plotWidget.setMinimumHeight(500)
 
+        self.logosWidget = QWidget()
+        layout = QHBoxLayout()
+        self.logosWidget.setLayout(layout)
+
+        for image in [
+            'newcastle_university_logo.png',
+            'uganda_red_cross_society_long_small.png',
+            'shear_logo.png',
+            'actogether_uganda_small.png',
+            'makerere_university_logo_long_small.png',
+        ]:
+
+            logo = QLabel()
+            logo.setPixmap(QtGui.QPixmap(os.path.join(os.path.dirname(__file__), 'img', image)))
+            layout.addWidget(logo)
+            logo.setAlignment(QtCore.Qt.AlignCenter)
+
         row1 = QHBoxLayout()
 
         self.saveButton = QPushButton('Save')
@@ -95,6 +112,7 @@ class App(QMainWindow):
         self.mainLayout.setAlignment(QtCore.Qt.AlignCenter)
         self.mainLayout.addWidget(self.plotWidget)
         self.mainLayout.addWidget(self.saveButton)
+        self.mainLayout.addWidget(self.logosWidget)
 
         if self.path is not None:
             self.add_data()
