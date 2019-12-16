@@ -7,7 +7,7 @@ import os
 import argparse
 import pandas as pd
 import matplotlib.pyplot as plt
-from reportlab.platypus import SimpleDocTemplate, Paragraph
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Image, Table, TableStyle
 from svglib.svglib import svg2rlg
 from reportlab.lib.pagesizes import A4, landscape
 from reportlab.lib.styles import getSampleStyleSheet
@@ -50,16 +50,18 @@ class App(QMainWindow):
         layout = QHBoxLayout()
         self.logosWidget.setLayout(layout)
 
-        for image in [
+        self.logos = [os.path.join(os.path.dirname(__file__), 'img', image) for image in [
             'newcastle_university_logo.png',
             'uganda_red_cross_society_long_small.png',
             'shear_logo.png',
             'actogether_uganda_small.png',
             'makerere_university_logo_long_small.png',
-        ]:
+        ]]
+
+        for image in self.logos:
 
             logo = QLabel()
-            logo.setPixmap(QtGui.QPixmap(os.path.join(os.path.dirname(__file__), 'img', image)))
+            logo.setPixmap(QtGui.QPixmap(image))
             layout.addWidget(logo)
             logo.setAlignment(QtCore.Qt.AlignCenter)
 
@@ -205,8 +207,28 @@ class App(QMainWindow):
         doc = SimpleDocTemplate(path, rightMargin=0, leftMargin=0, topMargin=0, bottomMargin=0,
                                 pagesize=landscape(A4))
 
-        doc.build([Paragraph(self.title,
-            style=title_style), svg2rlg(self.svg)])
+        story = [Paragraph(self.title, style=title_style), svg2rlg(self.svg)]
+
+        chart_style = TableStyle([('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+                                  ('VALIGN', (0, 0), (-1, -1), 'CENTER')])
+
+        images = []
+
+        for logo in self.logos:
+            from reportlab.lib import utils
+            from reportlab.lib.units import cm
+            height = 0.5 * cm
+
+            img = utils.ImageReader(logo)
+            iw, ih = img.getSize()
+            aspect = iw / ih
+            images.append(Image(logo, width=height*aspect, height=height))
+
+        story.append(Table([images],
+                           colWidths=[150 for _ in self.logos],
+                           rowHeights=[3], style=chart_style))
+
+        doc.build(story)
 
     def dragEnterEvent(self, event):
         if event.mimeData().hasText():
