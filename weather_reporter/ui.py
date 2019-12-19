@@ -13,6 +13,7 @@ from reportlab.lib.pagesizes import A4, landscape
 from reportlab.lib.styles import getSampleStyleSheet
 from io import BytesIO
 import matplotlib.dates as mdates
+from typing import List
 
 style = getSampleStyleSheet()
 register_matplotlib_converters()
@@ -23,15 +24,14 @@ min_length = 5
 
 class App(QMainWindow):
 
-    def __init__(self, path=None):
+    def __init__(self, paths=None):
         super().__init__()
 
-        self.df: pd.DataFrame = None
+        self.dfs: List[pd.DataFrame] = []
         self.svg: BytesIO = None
         self.freq = '1H'
-        self.df = None
-        self.rain = None
-        self.temp = None
+        self.rain: List[pd.Series] = []
+        self.temp: List[pd.Series] = []
         self.dates = None
         self.title = None
         self.location = None
@@ -39,7 +39,7 @@ class App(QMainWindow):
         self.setWindowTitle('SHEAR Weather Reporter')
         self.activateWindow()
         self.setAcceptDrops(True)
-        self.path = path
+        self.paths = paths
         plotWidget = QWidget()
         plotWidgetLayout = QHBoxLayout()
         plotWidget.setLayout(plotWidgetLayout)
@@ -111,7 +111,7 @@ class App(QMainWindow):
         self.mainLayout.addWidget(self.saveButton)
         self.mainLayout.addWidget(self.logosWidget)
 
-        if self.path is not None:
+        if self.paths is not None:
             self.add_data()
 
     def update_location(self):
@@ -129,56 +129,58 @@ class App(QMainWindow):
     def update_plot(self):
 
         self.svg = BytesIO()
-
-        f, ax = plt.subplots(figsize=(9, 6))
+        f, axes = plt.subplots(len(self.dfs), figsize=(9, 6))
         date = self.dateDropDown.currentData()
 
         end_index = self.dates.index.get_loc(date)+1
-        if end_index >= len(self.dates):
-            end_date = self.temp.index[-1]
-        else:
-            end_date = self.dates.index[end_index]
 
-        temp = self.temp.loc[date:end_date]
+        for ax, temp, rain in zip(axes.flat, self.temp, self.rain):
 
-        ax.plot(temp.index.start_time, temp.values, color='firebrick')
+            if end_index >= len(self.dates):
+                end_date = temp.index[-1]
+            else:
+                end_date = self.dates.index[end_index]
 
-        ax.set_ylabel('Temperature (C)')
+            temp = temp.loc[date:end_date]
 
-        ymin, ymax = ax.get_ylim()
-        ymax = ymax + ymax - ymin
-        ax.set_ylim(ymin, ymax)
+            ax.plot(temp.index.start_time, temp.values, color='firebrick')
 
-        twinx = ax.twinx()
+            ax.set_ylabel('Temperature (C)')
 
-        twinx.invert_yaxis()
+            ymin, ymax = ax.get_ylim()
+            ymax = ymax + ymax - ymin
+            ax.set_ylim(ymin, ymax)
 
-        rain = self.rain.loc[date:end_date].iloc[:-1]
+            twinx = ax.twinx()
 
-        width = rain.index.end_time - rain.index.start_time
+            twinx.invert_yaxis()
 
-        twinx.bar(rain.index.start_time, rain.values, width=width, align='edge')
+            rain = rain.loc[date:end_date].iloc[:-1]
 
-        twinx.set_ylabel('Rainfall (mm)')
+            width = rain.index.end_time - rain.index.start_time
 
-        ymax, ymin = twinx.get_ylim()
-        ymax = ymax + ymax - ymin
-        twinx.set_ylim(ymax, ymin)
+            twinx.bar(rain.index.start_time, rain.values, width=width, align='edge')
 
-        locator = mdates.AutoDateLocator()
-        ax.xaxis.set_major_locator(locator)
-        ax.xaxis.set_major_formatter(mdates.ConciseDateFormatter(locator))
+            twinx.set_ylabel('Rainfall (mm)')
 
-        plt.tight_layout()
+            ymax, ymin = twinx.get_ylim()
+            ymax = ymax + ymax - ymin
+            twinx.set_ylim(ymax, ymin)
 
-        self.title = '{} Weather Report for the {} of {}'.format(
-            self.resampleDropDown.currentText(),
-            self.durationDropDown.currentText(),
-            self.dateDropDown.currentText())
+            locator = mdates.AutoDateLocator()
+            ax.xaxis.set_major_locator(locator)
+            ax.xaxis.set_major_formatter(mdates.ConciseDateFormatter(locator))
 
-        self.plotTitleWidget.setText(self.title)
-        ax.set_title("Location: {}".format(self.location.title()))
-        ax.patch.set_visible(False)
+            plt.tight_layout()
+
+            self.title = '{} Weather Report for the {} of {}'.format(
+                self.resampleDropDown.currentText(),
+                self.durationDropDown.currentText(),
+                self.dateDropDown.currentText())
+
+            self.plotTitleWidget.setText(self.title)
+            ax.set_title("Location: {}".format(self.location.title()))
+            ax.patch.set_visible(False)
         f.patch.set_visible(False)
 
         f.savefig(self.svg, format='svg')
@@ -238,32 +240,33 @@ class App(QMainWindow):
             break
 
     def add_data(self):
+        for path in self.paths:
+            self.location = os.path.splitext(os.path.basename(path))[0]
+            df = pd.read_csv(path, sep='\t', parse_dates=[[0, 1]], header=[0, 1], na_values='---', dayfirst=True)
+            df = df.set_index(df.columns[0])
+            df.index.name = None
+            df.index = df.index.to_period('1H')
+            df.columns = [' '.join([c.strip() for c in col if 'Unnamed' not in c]).lower() for col in df.columns]
+            df.columns = [col.replace(' ', '_').replace('.', '') for col in df.columns]
+            self.dfs.append(df)
 
-        self.location = os.path.splitext(os.path.basename(self.path))[0]
-        self.df = pd.read_csv(self.path, sep='\t', parse_dates=[[0, 1]], header=[0, 1], na_values='---', dayfirst=True)
-        self.df = self.df.set_index(self.df.columns[0])
-        self.df.index.name = None
-        self.df.index = self.df.index.to_period('1H')
-        self.df.columns = [' '.join([c.strip() for c in col if 'Unnamed' not in c]).lower() for col in self.df.columns]
-        self.df.columns = [col.replace(' ', '_').replace('.', '') for col in self.df.columns]
+            duration = df.index[-1].end_time - df.index[0].start_time
 
-        duration = self.df.index[-1].end_time - self.df.index[0].start_time
+            if duration > pd.Timedelta(hours=min_length):
+                self.resampleDropDown.addItem('Hourly', '1H')
+                self.durationDropDown.addItem('Day', 'day')
+            if duration > pd.Timedelta(days=min_length):
+                self.resampleDropDown.addItem('Daily', '1D')
+                self.durationDropDown.addItem('Week', 'week')
+                self.durationDropDown.addItem('Month', 'month')
+            if duration > pd.Timedelta(weeks=min_length):
+                self.resampleDropDown.addItem('Weekly', '1W')
+            if duration > pd.Timedelta(days=31 * min_length):
+                self.resampleDropDown.addItem('Monthly', '1M')
+                self.durationDropDown.addItem('Year', 'year')
 
-        if duration > pd.Timedelta(hours=min_length):
-            self.resampleDropDown.addItem('Hourly', '1H')
-            self.durationDropDown.addItem('Day', 'day')
-        if duration > pd.Timedelta(days=min_length):
-            self.resampleDropDown.addItem('Daily', '1D')
-            self.durationDropDown.addItem('Week', 'week')
-            self.durationDropDown.addItem('Month', 'month')
-        if duration > pd.Timedelta(weeks=min_length):
-            self.resampleDropDown.addItem('Weekly', '1W')
-        if duration > pd.Timedelta(days=31 * min_length):
-            self.resampleDropDown.addItem('Monthly', '1M')
-            self.durationDropDown.addItem('Year', 'year')
-
-        self.rain = self.df.rain
-        self.temp = self.df.temp_out
+            self.rain.append(df.rain)
+            self.temp.append(df.temp_out)
 
         self.set_duration()
         self.set_frequency()
@@ -271,10 +274,11 @@ class App(QMainWindow):
         self.update_plot()
 
         self.showWidgets(True)
+        print(len(self.dfs))
 
     def set_duration(self):
         duration = self.durationDropDown.currentData()
-        periods = getattr(self.rain.index.to_series().dt, duration)
+        periods = getattr(self.rain[0].index.to_series().dt, duration)
         self.dates = periods[periods.diff() != 0]
         self.dateDropDown.clear()
 
@@ -300,15 +304,16 @@ class App(QMainWindow):
         freq = self.resampleDropDown.itemData(self.resampleDropDown.currentIndex())
 
         self.freq = freq
-        self.rain = self.df.rain.resample(freq).sum()
-        self.temp = self.df.temp_out.resample(freq).mean()
+        for i in range(len(self.dfs)):
+            self.rain[i] = self.dfs[i].rain.resample(freq).sum()
+            self.temp[i] = self.dfs[i].temp_out.resample(freq).mean()
 
         self.update_plot()
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('-f')
+    parser.add_argument('-f', action='append')
     args = parser.parse_args()
 
     app = QApplication(sys.argv)
