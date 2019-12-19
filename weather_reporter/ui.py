@@ -254,17 +254,25 @@ class App(QMainWindow):
         duration = self.stations[0].df.index[-1].end_time - self.stations[0].df.index[0].start_time
 
         if duration > pd.Timedelta(hours=min_length):
-            self.resampleDropDown.addItem('Hourly', '1H')
-            self.durationDropDown.addItem('Day', 'day')
+            if self.resampleDropDown.findText('Hourly') == -1:
+                self.resampleDropDown.addItem('Hourly', '1H')
+            if self.durationDropDown.findText('Day') == -1:
+                self.durationDropDown.addItem('Day', 'day')
         if duration > pd.Timedelta(days=min_length):
-            self.resampleDropDown.addItem('Daily', '1D')
-            self.durationDropDown.addItem('Week', 'week')
-            self.durationDropDown.addItem('Month', 'month')
+            if self.resampleDropDown.findText('Daily') == -1:
+                self.resampleDropDown.addItem('Daily', '1D')
+            if self.durationDropDown.findText('Week') == -1:
+                self.durationDropDown.addItem('Week', 'week')
+            if self.durationDropDown.findText('Month') == -1:
+                self.durationDropDown.addItem('Month', 'month')
         if duration > pd.Timedelta(weeks=min_length):
-            self.resampleDropDown.addItem('Weekly', '1W')
+            if self.resampleDropDown.findText('Weekly') == -1:
+                self.resampleDropDown.addItem('Weekly', '1W')
         if duration > pd.Timedelta(days=31 * min_length):
-            self.resampleDropDown.addItem('Monthly', '1M')
-            self.durationDropDown.addItem('Year', 'year')
+            if self.resampleDropDown.findText('Monthly') == -1:
+                self.resampleDropDown.addItem('Monthly', '1M')
+            if self.durationDropDown.findText('Year') == -1:
+                self.durationDropDown.addItem('Year', 'year')
 
         self.set_duration()
         self.set_frequency()
