@@ -14,6 +14,7 @@ from reportlab.lib.styles import getSampleStyleSheet
 from io import BytesIO
 import matplotlib.dates as mdates
 from typing import List
+from station import Station
 
 style = getSampleStyleSheet()
 register_matplotlib_converters()
@@ -27,14 +28,11 @@ class App(QMainWindow):
     def __init__(self, paths=None):
         super().__init__()
 
-        self.dfs: List[pd.DataFrame] = []
+        self.stations: List[Station] = []
         self.svg: BytesIO = None
         self.freq = '1H'
-        self.rain: List[pd.Series] = []
-        self.temp: List[pd.Series] = []
         self.dates = None
         self.title = None
-        self.location = None
         
         self.setWindowTitle('SHEAR Weather Reporter')
         self.activateWindow()
@@ -129,19 +127,22 @@ class App(QMainWindow):
     def update_plot(self):
 
         self.svg = BytesIO()
-        f, axes = plt.subplots(len(self.dfs), figsize=(9, 6))
+        f, axes = plt.subplots(len(self.stations), figsize=(9, 6))
         date = self.dateDropDown.currentData()
 
         end_index = self.dates.index.get_loc(date)+1
 
-        for ax, temp, rain in zip(axes.flat if len(self.paths) > 1 else [axes], self.temp, self.rain):
+        for ax, station in zip(axes.flat if len(self.paths) > 1 else [axes], self.stations):
 
             if end_index >= len(self.dates):
-                end_date = temp.index[-1]
+                end_date = station.temp.index[-1]
             else:
                 end_date = self.dates.index[end_index]
 
-            temp = temp.loc[date:end_date]
+            try:
+                temp = station.temp.loc[date:end_date]
+            except KeyError:
+                temp = station.temp.iloc[0:0]
 
             ax.plot(temp.index.start_time, temp.values, color='firebrick')
 
@@ -155,7 +156,10 @@ class App(QMainWindow):
 
             twinx.invert_yaxis()
 
-            rain = rain.loc[date:end_date].iloc[:-1]
+            try:
+                rain = station.rain.loc[date:end_date].iloc[:-1]
+            except KeyError:
+                rain = station.rain.iloc[0:0]
 
             width = rain.index.end_time - rain.index.start_time
 
@@ -179,7 +183,7 @@ class App(QMainWindow):
                 self.dateDropDown.currentText())
 
             self.plotTitleWidget.setText(self.title)
-            ax.set_title("Location: {}".format(self.location.title()))
+            ax.set_title("Location: {}".format(station.location.title()))
             ax.patch.set_visible(False)
         f.patch.set_visible(False)
 
@@ -245,19 +249,9 @@ class App(QMainWindow):
             paths = self.paths
 
         for path in paths:
-            self.location = os.path.splitext(os.path.basename(path))[0]
-            df = pd.read_csv(path, sep='\t', parse_dates=[[0, 1]], header=[0, 1], na_values='---', dayfirst=True)
-            df = df.set_index(df.columns[0])
-            df.index.name = None
-            df.index = df.index.to_period('1H')
-            df.columns = [' '.join([c.strip() for c in col if 'Unnamed' not in c]).lower() for col in df.columns]
-            df.columns = [col.replace(' ', '_').replace('.', '') for col in df.columns]
-            self.dfs.append(df)
+            self.stations.append(Station(path))
 
-            duration = df.index[-1].end_time - df.index[0].start_time
-
-            self.rain.append(df.rain)
-            self.temp.append(df.temp_out)
+        duration = self.stations[0].df.index[-1].end_time - self.stations[0].df.index[0].start_time
 
         if duration > pd.Timedelta(hours=min_length):
             self.resampleDropDown.addItem('Hourly', '1H')
@@ -281,7 +275,9 @@ class App(QMainWindow):
 
     def set_duration(self):
         duration = self.durationDropDown.currentData()
-        periods = getattr(self.rain[0].index.to_series().dt, duration)
+        record_lengths = [station.record_length for station in self.stations]
+        idx = record_lengths.index(max(record_lengths))
+        periods = getattr(self.stations[idx].rain.index.to_series().dt, duration)
         self.dates = periods[periods.diff() != 0]
         self.dateDropDown.clear()
 
@@ -307,9 +303,8 @@ class App(QMainWindow):
         freq = self.resampleDropDown.itemData(self.resampleDropDown.currentIndex())
 
         self.freq = freq
-        for i in range(len(self.dfs)):
-            self.rain[i] = self.dfs[i].rain.resample(freq).sum()
-            self.temp[i] = self.dfs[i].temp_out.resample(freq).mean()
+        for station in self.stations:
+            station.resample(self.freq)
 
         self.update_plot()
 
