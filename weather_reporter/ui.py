@@ -70,8 +70,6 @@ class App(QMainWindow):
             layout.addWidget(logo)
             logo.setAlignment(QtCore.Qt.AlignCenter)
 
-        row1 = QHBoxLayout()
-
         self.saveButton = QPushButton('Save')
         self.saveButton.clicked.connect(self.save)
 
@@ -86,21 +84,9 @@ class App(QMainWindow):
         self.dateDropDown = QComboBox()
         self.durationDropDown = QComboBox()
         self.durationDropDown.activated.connect(self.set_duration)
-        self.locationTextBox = QLineEdit()
-        self.locationTextBox.textChanged.connect(self.update_location)
-        self.locationTextBoxLabel = QLabel('Location:')
 
         self.dropWidget = QLabel('Drop a Davis WeatherLink export file here')
         self.dropWidget.setStyleSheet("margin:5px; border:1px dashed rgb(0, 0, 0); padding:10px")
-
-        self.resampleLabel = QLabel('Resolution:')
-        self.dateLabel = QLabel('Date:')
-        self.durationLabel = QLabel('Duration:')
-
-        font = QtGui.QFont("Times", 12, QtGui.QFont.Normal)
-        for label in [self.resampleLabel, self.dateLabel, self.durationLabel, self.locationTextBoxLabel]:
-            label.setAlignment(QtCore.Qt.AlignRight)
-            label.setFont(font)
 
         self.showWidgets(False)
 
@@ -108,27 +94,16 @@ class App(QMainWindow):
 
         self.dateDropDown.activated.connect(self.update_plot)
 
-        row1.addWidget(self.resampleLabel)
-        row1.addWidget(self.resampleDropDown)
-        row1.addWidget(self.durationLabel)
-        row1.addWidget(self.durationDropDown)
-        row1.addWidget(self.dateLabel)
-        row1.addWidget(self.dateDropDown)
-        row1.addWidget(self.dropWidget)
-        row1.addWidget(self.locationTextBoxLabel)
-        row1.addWidget(self.locationTextBox)
-
-        row2 = QHBoxLayout()
-
-        for row in [row1, row2]:
-            widget = QWidget()
-            widget.setLayout(row)
-            self.mainLayout.addWidget(widget)
 
         self.mainLayout.setAlignment(QtCore.Qt.AlignCenter)
         title = QWidget()
         title_layout = QHBoxLayout()
-        title_layout.addWidget(self.plotTitleWidget)
+        title_layout.addWidget(self.resampleDropDown)
+        title_layout.addWidget(QLabel('Weather Report for the'))
+        title_layout.addWidget(self.durationDropDown)
+        title_layout.addWidget(QLabel('of'))
+        title_layout.addWidget(self.dateDropDown)
+        # title_layout.addWidget(self.plotTitleWidget)
         title_layout.setAlignment(QtCore.Qt.AlignCenter)
         title.setLayout(title_layout)
         self.mainLayout.addWidget(title)
@@ -140,7 +115,6 @@ class App(QMainWindow):
             self.add_data()
 
     def update_location(self):
-        self.location = self.locationTextBox.text()
         if self.df is not None:
             self.update_plot()
 
@@ -150,9 +124,6 @@ class App(QMainWindow):
         self.resampleDropDown.setVisible(show)
         self.plotWidget.setVisible(show)
         self.saveButton.setVisible(show)
-        self.dateLabel.setVisible(show)
-        self.durationLabel.setVisible(show)
-        self.resampleLabel.setVisible(show)
         self.dropWidget.setVisible(not show)
         
     def update_plot(self):
@@ -200,20 +171,22 @@ class App(QMainWindow):
 
         plt.tight_layout()
 
+        self.title = '{} Weather Report for the {} of {}'.format(
+            self.resampleDropDown.currentText(),
+            self.durationDropDown.currentText(),
+            self.dateDropDown.currentText())
+
+        self.plotTitleWidget.setText(self.title)
+        ax.set_title("Location: {}".format(self.location.title()))
+        ax.patch.set_visible(False)
+        f.patch.set_visible(False)
+
         f.savefig(self.svg, format='svg')
         self.svg.seek(0)
         plt.close(f)
 
         self.plotWidget.load(self.svg.read())
         self.svg.seek(0)
-
-        self.title = '{} Weather at {} for the {} of {}'.format(
-            self.resampleDropDown.currentText(),
-            self.location.title(),
-            self.durationDropDown.currentText(),
-            self.dateDropDown.currentText())
-
-        self.plotTitleWidget.setText(self.title)
 
     def create_pdf(self, path):
 
@@ -267,7 +240,6 @@ class App(QMainWindow):
     def add_data(self):
 
         self.location = os.path.splitext(os.path.basename(self.path))[0]
-        self.locationTextBox.setText(self.location)
         self.df = pd.read_csv(self.path, sep='\t', parse_dates=[[0, 1]], header=[0, 1], na_values='---', dayfirst=True)
         self.df = self.df.set_index(self.df.columns[0])
         self.df.index.name = None
