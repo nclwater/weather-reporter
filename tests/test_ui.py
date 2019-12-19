@@ -17,7 +17,7 @@ app = QApplication(sys.argv)
 class TestLayout(unittest.TestCase):
     def setUp(self):
         self.app = App()
-        self.app.path = sample_data
+        self.app.paths = [sample_data]
         self.app.add_data()
 
     def test_set_duration(self):
