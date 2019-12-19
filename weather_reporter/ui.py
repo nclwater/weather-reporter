@@ -1,5 +1,5 @@
 from PyQt5.QtWidgets import QMainWindow, QApplication, QMessageBox, QComboBox, QVBoxLayout, QWidget, QPushButton, \
-    QFileDialog, QHBoxLayout, QLabel, QLineEdit
+    QFileDialog, QHBoxLayout, QLabel, QLineEdit, QDialog
 from pandas.plotting import register_matplotlib_converters
 from PyQt5 import QtSvg, QtCore, QtGui
 import sys
@@ -71,6 +71,9 @@ class App(QMainWindow):
         self.saveButton = QPushButton('Save')
         self.saveButton.clicked.connect(self.save)
 
+        self.updateButton = QPushButton('Rename')
+        self.updateButton.clicked.connect(self.rename_locations)
+
         self.mainLayout = QVBoxLayout()
 
         self.mainWidget = QWidget()
@@ -106,7 +109,12 @@ class App(QMainWindow):
         title.setLayout(title_layout)
         self.mainLayout.addWidget(title)
         self.mainLayout.addWidget(plotWidget)
-        self.mainLayout.addWidget(self.saveButton)
+        buttons = QWidget()
+        buttons_layout = QHBoxLayout()
+        buttons_layout.addWidget(self.updateButton)
+        buttons_layout.addWidget(self.saveButton)
+        buttons.setLayout(buttons_layout)
+        self.mainLayout.addWidget(buttons)
         self.mainLayout.addWidget(self.logosWidget)
 
         if self.paths is not None:
@@ -127,7 +135,7 @@ class App(QMainWindow):
     def update_plot(self):
 
         self.svg = BytesIO()
-        f, axes = plt.subplots(len(self.stations), figsize=(9, 6))
+        f, axes = plt.subplots(len(self.stations), figsize=(9, 6), sharex=True)
         date = self.dateDropDown.currentData()
 
         end_index = self.dates.index.get_loc(date)+1
@@ -183,7 +191,7 @@ class App(QMainWindow):
                 self.dateDropDown.currentText())
 
             self.plotTitleWidget.setText(self.title)
-            ax.set_title("Location: {}".format(station.location.title()))
+            ax.set_title("{}".format(station.location.title()))
             ax.patch.set_visible(False)
         f.patch.set_visible(False)
 
@@ -220,11 +228,11 @@ class App(QMainWindow):
 
             images.append(Image(logo, width=height*aspect, height=height))
 
-            story.append(Table([images],
-                               colWidths=[150 for _ in self.logos],
-                               rowHeights=[3], style=chart_style))
+        story.append(Table([images],
+                           colWidths=[150 for _ in self.logos],
+                           rowHeights=[3], style=chart_style))
 
-            doc.build(story)
+        doc.build(story)
 
     def dragEnterEvent(self, event):
         if event.mimeData().hasText():
@@ -314,6 +322,25 @@ class App(QMainWindow):
         for station in self.stations:
             station.resample(self.freq)
 
+        self.update_plot()
+
+    def rename_locations(self):
+        dialog = QDialog()
+        layout = QVBoxLayout()
+        dialog.setLayout(layout)
+        b = QPushButton('Update')
+        for station in self.stations:
+            row = QWidget(dialog)
+            row_layout = QHBoxLayout()
+            row_layout.addWidget(QLabel(station.path))
+            edit = QLineEdit(station.location)
+            row_layout.addWidget(edit)
+            edit.textChanged.connect(station.rename_location)
+            row.setLayout(row_layout)
+            layout.addWidget(row)
+        layout.addWidget(b)
+        b.clicked.connect(dialog.close)
+        dialog.exec_()
         self.update_plot()
 
 

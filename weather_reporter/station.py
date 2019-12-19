@@ -4,6 +4,7 @@ import pandas as pd
 
 class Station:
     def __init__(self, path):
+        self.path = path
         self.location = os.path.splitext(os.path.basename(path))[0]
         self.df = pd.read_csv(path, sep='\t', parse_dates=[[0, 1]], header=[0, 1], na_values='---', dayfirst=True)
         self.df = self.df.set_index(self.df.columns[0])
@@ -15,6 +16,9 @@ class Station:
 
         self.rain = self.df.rain
         self.temp = self.df.temp_out
+
+    def rename_location(self, name):
+        self.location = name
 
     def resample(self, freq):
         self.rain = self.df.rain.resample(freq).sum()
