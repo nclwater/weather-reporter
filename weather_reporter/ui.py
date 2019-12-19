@@ -134,7 +134,7 @@ class App(QMainWindow):
 
         end_index = self.dates.index.get_loc(date)+1
 
-        for ax, temp, rain in zip(axes.flat, self.temp, self.rain):
+        for ax, temp, rain in zip(axes.flat if len(self.paths) > 1 else [axes], self.temp, self.rain):
 
             if end_index >= len(self.dates):
                 end_date = temp.index[-1]
@@ -213,13 +213,14 @@ class App(QMainWindow):
             img = utils.ImageReader(logo)
             iw, ih = img.getSize()
             aspect = iw / ih
+
             images.append(Image(logo, width=height*aspect, height=height))
 
-        story.append(Table([images],
-                           colWidths=[150 for _ in self.logos],
-                           rowHeights=[3], style=chart_style))
+            story.append(Table([images],
+                               colWidths=[150 for _ in self.logos],
+                               rowHeights=[3], style=chart_style))
 
-        doc.build(story)
+            doc.build(story)
 
     def dragEnterEvent(self, event):
         if event.mimeData().hasText():
@@ -228,19 +229,22 @@ class App(QMainWindow):
             event.ignore()
 
     def dropEvent(self, event):
-        for url in event.mimeData().urls():
-            self.path = url.toLocalFile()
-            try:
-                self.add_data()
-            except pd.errors.ParserError:
-                msg = QMessageBox()
-                msg.setText('Could not load from {}'.format(os.path.basename(self.path)))
-                msg.exec_()
-                return
-            break
+        url = event.mimeData().urls()[0].toLocalFile()
+        self.paths.append(url)
+        try:
+            self.add_data([url])
+        except pd.errors.ParserError:
+            self.paths.pop()
+            msg = QMessageBox()
+            msg.setText('Could not load from {}'.format(os.path.basename(self.path)))
+            msg.exec_()
+            return
 
-    def add_data(self):
-        for path in self.paths:
+    def add_data(self, paths=None):
+        if paths is None:
+            paths = self.paths
+
+        for path in paths:
             self.location = os.path.splitext(os.path.basename(path))[0]
             df = pd.read_csv(path, sep='\t', parse_dates=[[0, 1]], header=[0, 1], na_values='---', dayfirst=True)
             df = df.set_index(df.columns[0])
@@ -252,21 +256,21 @@ class App(QMainWindow):
 
             duration = df.index[-1].end_time - df.index[0].start_time
 
-            if duration > pd.Timedelta(hours=min_length):
-                self.resampleDropDown.addItem('Hourly', '1H')
-                self.durationDropDown.addItem('Day', 'day')
-            if duration > pd.Timedelta(days=min_length):
-                self.resampleDropDown.addItem('Daily', '1D')
-                self.durationDropDown.addItem('Week', 'week')
-                self.durationDropDown.addItem('Month', 'month')
-            if duration > pd.Timedelta(weeks=min_length):
-                self.resampleDropDown.addItem('Weekly', '1W')
-            if duration > pd.Timedelta(days=31 * min_length):
-                self.resampleDropDown.addItem('Monthly', '1M')
-                self.durationDropDown.addItem('Year', 'year')
-
             self.rain.append(df.rain)
             self.temp.append(df.temp_out)
+
+        if duration > pd.Timedelta(hours=min_length):
+            self.resampleDropDown.addItem('Hourly', '1H')
+            self.durationDropDown.addItem('Day', 'day')
+        if duration > pd.Timedelta(days=min_length):
+            self.resampleDropDown.addItem('Daily', '1D')
+            self.durationDropDown.addItem('Week', 'week')
+            self.durationDropDown.addItem('Month', 'month')
+        if duration > pd.Timedelta(weeks=min_length):
+            self.resampleDropDown.addItem('Weekly', '1W')
+        if duration > pd.Timedelta(days=31 * min_length):
+            self.resampleDropDown.addItem('Monthly', '1M')
+            self.durationDropDown.addItem('Year', 'year')
 
         self.set_duration()
         self.set_frequency()
@@ -274,7 +278,6 @@ class App(QMainWindow):
         self.update_plot()
 
         self.showWidgets(True)
-        print(len(self.dfs))
 
     def set_duration(self):
         duration = self.durationDropDown.currentData()
