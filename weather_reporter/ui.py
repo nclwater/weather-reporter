@@ -15,6 +15,7 @@ from io import BytesIO
 import matplotlib.dates as mdates
 from typing import List
 from station import Station
+import webbrowser
 
 style = getSampleStyleSheet()
 register_matplotlib_converters()
@@ -111,6 +112,9 @@ class App(QMainWindow):
         self.mainLayout.addWidget(plotWidget)
         buttons = QWidget()
         buttons_layout = QHBoxLayout()
+        link = QPushButton('View Code on GitHub')
+        buttons_layout.addWidget(link)
+        link.clicked.connect(lambda _: webbrowser.open('github.com/fmcclean/weather-reporter'))
         buttons_layout.addWidget(self.updateButton)
         buttons_layout.addWidget(self.saveButton)
         buttons.setLayout(buttons_layout)
