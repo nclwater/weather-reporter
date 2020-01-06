@@ -1,5 +1,5 @@
 import unittest
-from weather_reporter.ui import App
+from weather_reporter.app import App
 import os
 from PyQt5.QtWidgets import QApplication
 import sys

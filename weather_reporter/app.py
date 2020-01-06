@@ -1,10 +1,10 @@
-from PyQt5.QtWidgets import QMainWindow, QApplication, QMessageBox, QComboBox, QVBoxLayout, QWidget, QPushButton, \
+from PyQt5.QtWidgets import QMainWindow, QMessageBox, QComboBox, QVBoxLayout, QWidget, QPushButton, \
     QFileDialog, QHBoxLayout, QLabel, QLineEdit, QDialog
 from pandas.plotting import register_matplotlib_converters
 from PyQt5 import QtSvg, QtCore, QtGui
-import sys
+
 import os
-import argparse
+
 import pandas as pd
 import matplotlib.pyplot as plt
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Image, Table, TableStyle
@@ -14,7 +14,7 @@ from reportlab.lib.styles import getSampleStyleSheet
 from io import BytesIO
 import matplotlib.dates as mdates
 from typing import List
-from station import Station
+from .station import Station
 import webbrowser
 
 style = getSampleStyleSheet()
@@ -345,14 +345,3 @@ class App(QMainWindow):
         b.clicked.connect(dialog.close)
         dialog.exec_()
         self.update_plot()
-
-
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
-    parser.add_argument('-f', action='append')
-    args = parser.parse_args()
-
-    app = QApplication(sys.argv)
-    ex = App(args.f)
-    ex.show()
-    sys.exit(app.exec_())

@@ -9,7 +9,7 @@ version = subprocess.check_output("git describe").strip().decode()
 block_cipher = None
 
 
-a = Analysis(['weather_reporter/ui.py', 'build.spec'],
+a = Analysis(['run_app.py', 'build.spec'],
              binaries=[],
              pathex=['C:/Users/AA/ZZ'],
              datas=[(os.path.join(os.path.dirname(tinycss2.__file__), 'VERSION'), 'tinycss2')],
