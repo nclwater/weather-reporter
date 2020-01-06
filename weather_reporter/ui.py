@@ -47,9 +47,6 @@ class App(QMainWindow):
         self.plotWidget.setFixedHeight(500)
         plotWidgetLayout.addWidget(self.plotWidget)
 
-        self.plotTitleWidget = QLabel()
-        self.plotTitleWidget.setFont(QtGui.QFont("Times", 20, QtGui.QFont.Bold))
-
         self.logosWidget = QWidget()
         layout = QHBoxLayout()
         self.logosWidget.setLayout(layout)
@@ -105,7 +102,10 @@ class App(QMainWindow):
         title_layout.addWidget(self.durationDropDown)
         title_layout.addWidget(QLabel('of'))
         title_layout.addWidget(self.dateDropDown)
-        # title_layout.addWidget(self.plotTitleWidget)
+
+        for i in range(title_layout.count()):
+            title_layout.itemAt(i).widget().setFont(QtGui.QFont("Times", 15, QtGui.QFont.Bold))
+
         title_layout.setAlignment(QtCore.Qt.AlignCenter)
         title.setLayout(title_layout)
         self.mainLayout.addWidget(title)
@@ -194,7 +194,6 @@ class App(QMainWindow):
                 self.durationDropDown.currentText(),
                 self.dateDropDown.currentText())
 
-            self.plotTitleWidget.setText(self.title)
             ax.set_title("{}".format(station.location.title()))
             ax.patch.set_visible(False)
         f.patch.set_visible(False)
