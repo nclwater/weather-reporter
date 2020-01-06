@@ -38,7 +38,7 @@ class App(QMainWindow):
         self.setWindowTitle('SHEAR Weather Reporter')
         self.activateWindow()
         self.setAcceptDrops(True)
-        self.paths = paths
+        self.paths = paths if type(paths) == list else []
         plotWidget = QWidget()
         plotWidgetLayout = QHBoxLayout()
         plotWidget.setLayout(plotWidgetLayout)
@@ -87,41 +87,43 @@ class App(QMainWindow):
         self.dropWidget = QLabel('Drop a Davis WeatherLink export file here')
         self.dropWidget.setStyleSheet("margin:5px; border:1px dashed rgb(0, 0, 0); padding:10px")
 
-        self.showWidgets(False)
-
         self.resampleDropDown.activated.connect(self.set_frequency)
 
         self.dateDropDown.activated.connect(self.update_plot)
 
 
         self.mainLayout.setAlignment(QtCore.Qt.AlignCenter)
-        title = QWidget()
+        self.title_widget = QWidget()
         title_layout = QHBoxLayout()
-        title_layout.addWidget(self.resampleDropDown)
-        title_layout.addWidget(QLabel('Weather Report for the'))
-        title_layout.addWidget(self.durationDropDown)
-        title_layout.addWidget(QLabel('of'))
-        title_layout.addWidget(self.dateDropDown)
 
-        for i in range(title_layout.count()):
-            title_layout.itemAt(i).widget().setFont(QtGui.QFont("Times", 15, QtGui.QFont.Bold))
+        for widget in [self.resampleDropDown,
+                       QLabel('Weather Report for the'),
+                       self.durationDropDown,
+                       QLabel('of'),
+                       self.dateDropDown]:
+            title_layout.addWidget(widget)
+            widget.setFont(QtGui.QFont("Times", 15, QtGui.QFont.Bold))
+
 
         title_layout.setAlignment(QtCore.Qt.AlignCenter)
-        title.setLayout(title_layout)
-        self.mainLayout.addWidget(title)
+        self.title_widget.setLayout(title_layout)
+        self.mainLayout.addWidget(self.dropWidget)
+        self.mainLayout.addWidget(self.title_widget)
         self.mainLayout.addWidget(plotWidget)
         buttons = QWidget()
         buttons_layout = QHBoxLayout()
-        link = QPushButton('View Code on GitHub')
-        buttons_layout.addWidget(link)
-        link.clicked.connect(lambda _: webbrowser.open('github.com/fmcclean/weather-reporter'))
+        self.linkButton = QPushButton('View Code on GitHub')
+        buttons_layout.addWidget(self.linkButton)
+        self.linkButton.clicked.connect(lambda _: webbrowser.open('github.com/fmcclean/weather-reporter'))
         buttons_layout.addWidget(self.updateButton)
         buttons_layout.addWidget(self.saveButton)
         buttons.setLayout(buttons_layout)
         self.mainLayout.addWidget(buttons)
         self.mainLayout.addWidget(self.logosWidget)
 
-        if self.paths is not None:
+        self.showWidgets(False)
+
+        if len(self.paths) > 0:
             self.add_data()
 
     def update_location(self):
@@ -129,9 +131,10 @@ class App(QMainWindow):
             self.update_plot()
 
     def showWidgets(self, show: bool):
-        self.dateDropDown.setVisible(show)
-        self.durationDropDown.setVisible(show)
-        self.resampleDropDown.setVisible(show)
+        self.title_widget.setVisible(show)
+        self.logosWidget.setVisible(show)
+        self.linkButton.setVisible(show)
+        self.updateButton.setVisible(show)
         self.plotWidget.setVisible(show)
         self.saveButton.setVisible(show)
         self.dropWidget.setVisible(not show)
@@ -194,7 +197,7 @@ class App(QMainWindow):
                 self.durationDropDown.currentText(),
                 self.dateDropDown.currentText())
 
-            ax.set_title("{}".format(station.location.title()))
+            ax.set_title("{}".format(station.location))
             ax.patch.set_visible(False)
         f.patch.set_visible(False)
 
