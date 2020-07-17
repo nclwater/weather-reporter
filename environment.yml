@@ -1,9 +1,0 @@
-dependencies:
-  - python=3.7
-  - pandas=0.25.3
-  - reportlab=3.5.26
-  - matplotlib=3.1.1
-  - pyqt=5.9.2
-  - pip:
-      - pyinstaller==3.5
-      - svglib==0.9.3

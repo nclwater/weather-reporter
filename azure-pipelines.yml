@@ -17,15 +17,15 @@ steps:
     git describe
   displayName: Get version number from git
 
-- powershell: Write-Host "##vso[task.prependpath]$env:CONDA\Scripts"
-  displayName: Add conda to PATH
 
-- script: conda env create -f environment.yml -n weather-reporter
-  displayName: Install packages from environment.yml
+- task: UsePythonVersion@0
+  inputs:
+    versionSpec: '3.7'
 
-- script: |
-    call activate weather-reporter
-    python -m unittest -f tests/test_app.py
+- script: pip install -r requirements.txt
+  displayName: Install packages from requirements
+
+- script: python -m unittest -f tests/test_app.py
   displayName: Test App
 
 - task: PublishPipelineArtifact@1
@@ -33,9 +33,7 @@ steps:
     targetPath: 'tests/outputs/output.pdf'
     artifactName: 'output.pdf'
 
-- script: |
-    call activate weather-reporter
-    python -m PyInstaller -y build.spec
+- script: python -m PyInstaller -y build.spec
   displayName: Build exe
 
 - task: GitHubRelease@0

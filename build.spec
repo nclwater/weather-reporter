@@ -2,6 +2,7 @@
 
 import os
 import tinycss2
+import cssselect2
 import subprocess
 
 version = subprocess.check_output("git describe").strip().decode()
@@ -12,8 +13,11 @@ block_cipher = None
 a = Analysis(['run_app.py', 'build.spec'],
              binaries=[],
              pathex=['C:/Users/AA/ZZ'],
-             datas=[(os.path.join(os.path.dirname(tinycss2.__file__), 'VERSION'), 'tinycss2'),
-                    ('weather_reporter/img', 'weather_reporter/img')],
+             datas=[
+                 (os.path.join(os.path.dirname(tinycss2.__file__), 'VERSION'), 'tinycss2'),
+                 (os.path.join(os.path.dirname(cssselect2.__file__), 'VERSION'), 'cssselect2'),
+                 ('weather_reporter/img', 'weather_reporter/img')
+             ],
              hiddenimports=['tinycss2'],
              win_no_prefer_redirects=False,
              win_private_assemblies=True,
