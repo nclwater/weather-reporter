@@ -20,11 +20,11 @@ steps:
 - powershell: Write-Host "##vso[task.prependpath]$env:CONDA\Scripts"
   displayName: Add conda to PATH
 
-- script: conda env update --quiet -f environment.yml -n base
+- script: conda env create -f environment.yml -n weather-reporter
   displayName: Install packages from environment.yml
 
 - script: |
-    call activate
+    call activate weather-reporter
     python -m unittest -f tests/test_app.py
   displayName: Test App
 
@@ -34,7 +34,7 @@ steps:
     artifactName: 'output.pdf'
 
 - script: |
-    call activate
+    call activate weather-reporter
     python -m PyInstaller -y build.spec
   displayName: Build exe
 
