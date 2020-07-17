@@ -49,5 +49,5 @@ steps:
     tag: $(version)
     assets: dist/*
     isDraft: false
-    isPreRelease: true
+    isPreRelease: false
     title: SHEAR Weather Reporter $(version)
